@@ -28,6 +28,7 @@
 #include "../uuid.h"
 #include "../version.h"
 #include "../alignment.h"
+#include "../signalrole.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -389,6 +390,12 @@ void XmlDomElement::setAttribute(const QString& name, const VAlign& value) noexc
     setAttribute<QString>(name, value.toString());
 }
 
+template <>
+void XmlDomElement::setAttribute(const QString& name, const SignalRole& value) noexcept
+{
+    setAttribute<QString>(name, value.toString());
+}
+
 bool XmlDomElement::hasAttribute(const QString& name) const noexcept
 {
     return mAttributes.contains(name);
@@ -613,6 +620,27 @@ VAlign XmlDomElement::getAttribute<VAlign>(const QString& name, bool throwIfEmpt
         {
             throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, attr,
                 QString(tr("Invalid vertical align attribute \"%1\" in node \"%2\".")).arg(name, mName));
+        }
+    }
+}
+
+template <>
+SignalRole XmlDomElement::getAttribute<SignalRole>(const QString& name, bool throwIfEmpty, const SignalRole& defaultValue) const throw (Exception)
+{
+    QString attr = getAttribute<QString>(name, throwIfEmpty);
+    try
+    {
+        SignalRole obj = SignalRole::fromString(attr);
+        return obj;
+    }
+    catch (Exception& exc)
+    {
+        if ((attr.isEmpty()) && (!throwIfEmpty))
+            return defaultValue;
+        else
+        {
+            throw FileParseError(__FILE__, __LINE__, getDocFilePath(), -1, -1, attr,
+                QString(tr("Invalid signal role attribute \"%1\" in node \"%2\".")).arg(name, mName));
         }
     }
 }
