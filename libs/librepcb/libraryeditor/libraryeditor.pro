@@ -25,17 +25,20 @@ SOURCES += \
     common/categorychooserdialog.cpp \
     common/categorytreelabeltextbuilder.cpp \
     common/editorwidgetbase.cpp \
-    cmpcat/componentcategoryeditorwidget.cpp
+    cmpcat/componentcategoryeditorwidget.cpp \
+    pkgcat/packagecategoryeditorwidget.cpp
 
 HEADERS += \
     libraryeditor.h \
     common/categorychooserdialog.h \
     common/categorytreelabeltextbuilder.h \
     common/editorwidgetbase.h \
-    cmpcat/componentcategoryeditorwidget.h
+    cmpcat/componentcategoryeditorwidget.h \
+    pkgcat/packagecategoryeditorwidget.h
 
 FORMS += \
     libraryeditor.ui \
     common/categorychooserdialog.ui \
-    cmpcat/componentcategoryeditorwidget.ui
+    cmpcat/componentcategoryeditorwidget.ui \
+    pkgcat/packagecategoryeditorwidget.ui
 
