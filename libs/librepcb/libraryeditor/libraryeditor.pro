@@ -30,6 +30,7 @@ SOURCES += \
     cmp/componentsymbolvarianteditorwidget.cpp \
     cmpcat/componentcategoryeditorwidget.cpp \
     dev/deviceeditorwidget.cpp \
+    lib/libraryoverviewwidget.cpp \
     pkg/packageeditorwidget.cpp \
     pkgcat/packagecategoryeditorwidget.cpp \
     sym/symboleditorwidget.cpp
@@ -44,6 +45,7 @@ HEADERS += \
     cmp/componentsymbolvarianteditorwidget.h \
     cmpcat/componentcategoryeditorwidget.h \
     dev/deviceeditorwidget.h \
+    lib/libraryoverviewwidget.h \
     pkg/packageeditorwidget.h \
     pkgcat/packagecategoryeditorwidget.h \
     sym/symboleditorwidget.h
@@ -56,6 +58,7 @@ FORMS += \
     cmp/componentsymbolvarianteditorwidget.ui \
     cmpcat/componentcategoryeditorwidget.ui \
     dev/deviceeditorwidget.ui \
+    lib/libraryoverviewwidget.ui \
     pkg/packageeditorwidget.ui \
     pkgcat/packagecategoryeditorwidget.ui \
     sym/symboleditorwidget.ui
