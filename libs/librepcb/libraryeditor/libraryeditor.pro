@@ -22,12 +22,15 @@ INCLUDEPATH += \
 
 SOURCES += \
     libraryeditor.cpp \
+    common/categorychooserdialog.cpp \
     common/editorwidgetbase.cpp
 
 HEADERS += \
     libraryeditor.h \
+    common/categorychooserdialog.h \
     common/editorwidgetbase.h
 
 FORMS += \
-    libraryeditor.ui
+    libraryeditor.ui \
+    common/categorychooserdialog.ui
 
