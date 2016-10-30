@@ -24,15 +24,18 @@ SOURCES += \
     libraryeditor.cpp \
     common/categorychooserdialog.cpp \
     common/categorytreelabeltextbuilder.cpp \
-    common/editorwidgetbase.cpp
+    common/editorwidgetbase.cpp \
+    cmpcat/componentcategoryeditorwidget.cpp
 
 HEADERS += \
     libraryeditor.h \
     common/categorychooserdialog.h \
     common/categorytreelabeltextbuilder.h \
-    common/editorwidgetbase.h
+    common/editorwidgetbase.h \
+    cmpcat/componentcategoryeditorwidget.h
 
 FORMS += \
     libraryeditor.ui \
-    common/categorychooserdialog.ui
+    common/categorychooserdialog.ui \
+    cmpcat/componentcategoryeditorwidget.ui
 
