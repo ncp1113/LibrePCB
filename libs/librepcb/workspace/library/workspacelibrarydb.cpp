@@ -224,9 +224,29 @@ QSet<Uuid> WorkspaceLibraryDb::getPackageCategoryChilds(const Uuid& parent) cons
     return getCategoryChilds("package_categories", parent);
 }
 
+QList<Uuid> WorkspaceLibraryDb::getComponentCategoryParents(const Uuid& category) const throw (Exception)
+{
+    return getCategoryParents("component_categories", category);
+}
+
+QList<Uuid> WorkspaceLibraryDb::getPackageCategoryParents(const Uuid& category) const throw (Exception)
+{
+    return getCategoryParents("package_categories", category);
+}
+
+QSet<Uuid> WorkspaceLibraryDb::getSymbolsByCategory(const Uuid& category) const throw (Exception)
+{
+    return getElementsByCategory("symbols", "symbol_id", category);
+}
+
 QSet<Uuid> WorkspaceLibraryDb::getComponentsByCategory(const Uuid& category) const throw (Exception)
 {
     return getElementsByCategory("components", "component_id", category);
+}
+
+QSet<Uuid> WorkspaceLibraryDb::getDevicesByCategory(const Uuid& category) const throw (Exception)
+{
+    return getElementsByCategory("devices", "device_id", category);
 }
 
 QSet<Uuid> WorkspaceLibraryDb::getDevicesOfComponent(const Uuid& component) const throw (Exception)
@@ -337,6 +357,45 @@ QSet<Uuid> WorkspaceLibraryDb::getCategoryChilds(const QString& tablename, const
         }
     }
     return elements;
+}
+
+QList<Uuid> WorkspaceLibraryDb::getCategoryParents(const QString& tablename, Uuid category) const throw (Exception)
+{
+    QList<Uuid> parentUuids;
+    while (!(category = getCategoryParent(tablename, category)).isNull()) {
+        if (parentUuids.contains(category)) {
+            throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr("Endless loop "
+                "in category parentship detected (%1).")).arg(category.toStr()));
+        } else {
+            parentUuids.append(category);
+        }
+    }
+    return parentUuids;
+}
+
+Uuid WorkspaceLibraryDb::getCategoryParent(const QString& tablename, const Uuid& category) const throw (Exception)
+{
+    QSqlQuery query = mDb->prepareQuery(
+        "SELECT parent_uuid FROM " % tablename %
+        " WHERE uuid = '" % category.toStr() % "'" %
+        " ORDER BY version DESC" %
+        " LIMIT 1");
+    mDb->exec(query);
+
+    if (query.next()) {
+        QVariant value = query.value(0);
+        Uuid uuid(value.toString());
+        if (!uuid.isNull()) {
+            return uuid;
+        } else if (value.isNull()) {
+            return Uuid();
+        } else {
+            throw LogicError(__FILE__, __LINE__);
+        }
+    } else {
+        throw RuntimeError(__FILE__, __LINE__, QString(), QString(tr("The category "
+            "\"%1\" does not exist in the library database.")).arg(category.toStr()));
+    }
 }
 
 QSet<Uuid> WorkspaceLibraryDb::getElementsByCategory(const QString& tablename,
