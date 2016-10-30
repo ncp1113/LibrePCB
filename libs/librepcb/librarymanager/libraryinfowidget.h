@@ -82,6 +82,7 @@ class LibraryInfoWidget final : public QWidget
 
     private: // Methods
 
+        void btnOpenLibraryEditorClicked() noexcept;
         void btnRemoveLibraryClicked() noexcept;
         bool isRemoteLibrary() const noexcept;
 

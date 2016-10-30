@@ -25,6 +25,7 @@
 #include "libraryinfowidget.h"
 #include "ui_libraryinfowidget.h"
 #include <librepcb/library/library.h>
+#include <librepcb/libraryeditor/libraryeditor.h>
 #include <librepcb/workspace/workspace.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 
@@ -44,6 +45,8 @@ LibraryInfoWidget::LibraryInfoWidget(workspace::Workspace& ws, QSharedPointer<Li
     mWorkspace(ws), mLib(lib)
 {
     mUi->setupUi(this);
+    connect(mUi->btnOpenLibraryEditor, &QPushButton::clicked,
+            this, &LibraryInfoWidget::btnOpenLibraryEditorClicked);
     connect(mUi->btnRemove, &QPushButton::clicked,
             this, &LibraryInfoWidget::btnRemoveLibraryClicked);
 
@@ -98,6 +101,18 @@ LibraryInfoWidget::~LibraryInfoWidget() noexcept
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
+
+void LibraryInfoWidget::btnOpenLibraryEditorClicked() noexcept
+{
+    try {
+        using library::editor::LibraryEditor;
+        QScopedPointer<LibraryEditor> editor(new LibraryEditor(mWorkspace, mLib));
+        editor->show();
+        editor.take(); // release ownership because the editor deletes itself after closing
+    } catch (const Exception& e) {
+        QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+    }
+}
 
 void LibraryInfoWidget::btnRemoveLibraryClicked() noexcept
 {
