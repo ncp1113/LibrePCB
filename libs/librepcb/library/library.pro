@@ -47,7 +47,8 @@ HEADERS += \
     pkg/footprintpadpreviewgraphicsitem.h \
     pkg/footprintpreviewgraphicsitem.h \
     library.h \
-    cmp/cmpsigpindisplaytype.h
+    cmp/cmpsigpindisplaytype.h \
+    cmp/cmpsigpindisplaytypecombobox.h
 
 SOURCES += \
     cat/componentcategory.cpp \
@@ -75,5 +76,6 @@ SOURCES += \
     pkg/footprintpadpreviewgraphicsitem.cpp \
     pkg/footprintpreviewgraphicsitem.cpp \
     library.cpp \
-    cmp/cmpsigpindisplaytype.cpp
+    cmp/cmpsigpindisplaytype.cpp \
+    cmp/cmpsigpindisplaytypecombobox.cpp
 
