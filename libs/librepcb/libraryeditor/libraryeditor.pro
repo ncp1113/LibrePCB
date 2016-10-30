@@ -27,6 +27,7 @@ SOURCES += \
     common/categorytreelabeltextbuilder.cpp \
     common/editorwidgetbase.cpp \
     cmpcat/componentcategoryeditorwidget.cpp \
+    pkg/packageeditorwidget.cpp \
     pkgcat/packagecategoryeditorwidget.cpp \
     sym/symboleditorwidget.cpp
 
@@ -37,6 +38,7 @@ HEADERS += \
     common/categorytreelabeltextbuilder.h \
     common/editorwidgetbase.h \
     cmpcat/componentcategoryeditorwidget.h \
+    pkg/packageeditorwidget.h \
     pkgcat/packagecategoryeditorwidget.h \
     sym/symboleditorwidget.h
 
@@ -45,6 +47,7 @@ FORMS += \
     common/categorychooserdialog.ui \
     common/categorylisteditorwidget.ui \
     cmpcat/componentcategoryeditorwidget.ui \
+    pkg/packageeditorwidget.ui \
     pkgcat/packagecategoryeditorwidget.ui \
     sym/symboleditorwidget.ui
 
