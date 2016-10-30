@@ -41,7 +41,13 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The Symbol class
+ * @brief The Symbol class represents the part of a component which is added to schematics
+ *
+ * Following information is considered as the "interface" of a symbol and must therefore
+ * never be changed:
+ *  - UUID
+ *  - Pins (neither adding nor removing pins is allowed)
+ *    - UUID
  */
 class Symbol final : public LibraryElement
 {
@@ -52,9 +58,9 @@ class Symbol final : public LibraryElement
         // Constructors / Destructor
         Symbol() = delete;
         Symbol(const Symbol& other) = delete;
-        explicit Symbol(const Uuid& uuid, const Version& version, const QString& author,
-                        const QString& name_en_US, const QString& description_en_US,
-                        const QString& keywords_en_US) throw (Exception);
+        Symbol(const Uuid& uuid, const Version& version, const QString& author,
+               const QString& name_en_US, const QString& description_en_US,
+               const QString& keywords_en_US) throw (Exception);
         explicit Symbol(const FilePath& elementDirectory, bool readOnly) throw (Exception);
         ~Symbol() noexcept;
 
@@ -98,15 +104,13 @@ class Symbol final : public LibraryElement
         static QString getLongElementName() noexcept {return QStringLiteral("symbol");}
 
 
-    private:
-
-        // Private Methods
+    private: // Methods
 
         /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
 
-        // Symbol Attributes
+    private: // Data
         QMap<Uuid, SymbolPin*> mPins;
         QList<Polygon*> mPolygons;
         QList<Ellipse*> mEllipses;

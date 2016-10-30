@@ -43,7 +43,13 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The Footprint class
+ * @brief The Footprint class represents one footprint variant of a package
+ *
+ * Following information is considered as the "interface" of a footprint and must
+ * therefore never be changed:
+ *  - UUID
+ *  - Footprint pads (neither adding nor removing pads is allowed)
+ *    - UUID
  */
 class Footprint final : public IF_XmlSerializableObject
 {
@@ -52,8 +58,10 @@ class Footprint final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit Footprint(const Uuid& uuid, const QString& name_en_US,
-                           const QString& description_en_US) throw (Exception);
+        Footprint() = delete;
+        Footprint(const Footprint& other) = delete;
+        Footprint(const Uuid& uuid, const QString& name_en_US,
+                  const QString& description_en_US) throw (Exception);
         explicit Footprint(const XmlDomElement& domElement) throw (Exception);
         ~Footprint() noexcept;
 
@@ -110,22 +118,17 @@ class Footprint final : public IF_XmlSerializableObject
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
-
-    private:
-
-        // make some methods inaccessible...
-        Footprint() = delete;
-        Footprint(const Footprint& other) = delete;
+        // Operator Overloadings
         Footprint& operator=(const Footprint& rhs) = delete;
 
 
-        // Private Methods
+    private: // Methods
 
         /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Footprint Attributes
+    private: // Data
         Uuid mUuid;
         QMap<QString, QString> mNames;
         QMap<QString, QString> mDescriptions;

@@ -38,7 +38,15 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The ComponentSymbolVariant class
+ * @brief The ComponentSymbolVariant class represents a symbol variant of a component
+ *
+ * Following information is considered as the "interface" of a symbol variant and must
+ * therefore never be changed:
+ *  - UUID
+ *  - Symbol items (neither adding nor removing items is allowed)
+ *    - UUID
+ *    - Symbol UUID
+ *    - Pin-signal-mapping
  */
 class ComponentSymbolVariant final : public IF_XmlSerializableObject
 {
@@ -47,9 +55,10 @@ class ComponentSymbolVariant final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
-                                        const QString& name_en_US,
-                                        const QString& desc_en_US) noexcept;
+        ComponentSymbolVariant() = delete;
+        ComponentSymbolVariant(const ComponentSymbolVariant& other) = delete;
+        ComponentSymbolVariant(const Uuid& uuid, const QString& norm,
+                               const QString& name_en_US, const QString& desc_en_US) noexcept;
         explicit ComponentSymbolVariant(const XmlDomElement& domElement) throw (Exception);
         ~ComponentSymbolVariant() noexcept;
 
@@ -82,26 +91,22 @@ class ComponentSymbolVariant final : public IF_XmlSerializableObject
         /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
-
-    private:
-
-        // make some methods inaccessible...
-        ComponentSymbolVariant() = delete;
-        ComponentSymbolVariant(const ComponentSymbolVariant& other) = delete;
+        // Operator Overloadings
         ComponentSymbolVariant& operator=(const ComponentSymbolVariant& rhs) = delete;
 
-        // Private Methods
+
+    private: // Methods
 
         /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Symbol Variant Attributes
+    private: // Data
         Uuid mUuid;
         QString mNorm;
         QMap<QString, QString> mNames;
         QMap<QString, QString> mDescriptions;
-        QList<ComponentSymbolVariantItem*> mSymbolItems; ///< minimum one item
+        QList<ComponentSymbolVariantItem*> mSymbolItems; ///< at least one item
 };
 
 /*****************************************************************************************

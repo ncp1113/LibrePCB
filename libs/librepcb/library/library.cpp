@@ -23,6 +23,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "library.h"
+#include <librepcb/common/toolbox.h>
 #include <librepcb/common/fileio/xmldomelement.h>
 #include <librepcb/common/fileio/xmldomdocument.h>
 #include <librepcb/common/fileio/smartxmlfile.h>
@@ -69,7 +70,7 @@ Library::Library(const FilePath& libDir, bool readOnly) throw (Exception) :
     for (XmlDomElement* node = root.getFirstChild("properties/dependency", true, false);
          node; node = node->getNextSibling("dependency"))
     {
-        mDependencies.append(node->getText<Uuid>(true));
+        mDependencies.insert(node->getText<Uuid>(true));
     }
 
     // load image if available
@@ -93,7 +94,7 @@ Library::~Library() noexcept
 void Library::addDependency(const Uuid& uuid) noexcept
 {
     if ((!uuid.isNull()) && (!mDependencies.contains(uuid))) {
-        mDependencies.append(uuid);
+        mDependencies.insert(uuid);
     } else {
         qWarning() << "Invalid or duplicate library dependency:" << uuid.toStr();
     }
@@ -102,7 +103,7 @@ void Library::addDependency(const Uuid& uuid) noexcept
 void Library::removeDependency(const Uuid& uuid) noexcept
 {
     if ((!uuid.isNull()) && (mDependencies.contains(uuid))) {
-        mDependencies.removeAll(uuid);
+        mDependencies.remove(uuid);
     } else {
         qWarning() << "Invalid library dependency:" << uuid.toStr();
     }
@@ -154,7 +155,7 @@ XmlDomElement* Library::serializeToXmlDomElement() const throw (Exception)
     QScopedPointer<XmlDomElement> root(LibraryBaseElement::serializeToXmlDomElement());
     XmlDomElement* properties = root->appendChild("properties");
     properties->appendTextChild("url", mUrl.toString(QUrl::PrettyDecoded));
-    foreach (const Uuid& uuid, mDependencies) {
+    foreach (const Uuid& uuid, Toolbox::sortedQSet(mDependencies)) {
         properties->appendTextChild("dependency", uuid);
     }
     return root.take();

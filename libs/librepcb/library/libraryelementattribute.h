@@ -53,6 +53,8 @@ class LibraryElementAttribute final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
+        LibraryElementAttribute() = delete;
+        LibraryElementAttribute(const LibraryElementAttribute& other) = delete;
         explicit LibraryElementAttribute(const XmlDomElement& domElement) throw (Exception);
         ~LibraryElementAttribute() noexcept;
 
@@ -73,21 +75,17 @@ class LibraryElementAttribute final : public IF_XmlSerializableObject
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
-
-    private:
-
-        // make some methods inaccessible...
-        LibraryElementAttribute() = delete;
-        LibraryElementAttribute(const LibraryElementAttribute& other) = delete;
+        // Operator Overloadings
         LibraryElementAttribute& operator=(const LibraryElementAttribute& rhs) = delete;
 
-        // Private Methods
+
+    private: // Methods
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Attributes
+    private: // Data
         QString mKey;
         const AttributeType* mType;
         const AttributeUnit* mDefaultUnit;

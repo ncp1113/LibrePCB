@@ -38,7 +38,12 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The ComponentPinSignalMapItem class
+ * @brief The ComponentPinSignalMapItem class maps a symbol pin to a component signal
+ *
+ * Following information is considered as the "interface" of a pin-signal-mapping and must
+ * therefore never be changed:
+ *  - Pin UUID
+ *  - Signal UUID
  */
 class ComponentPinSignalMapItem final : public IF_XmlSerializableObject
 {
@@ -55,8 +60,10 @@ class ComponentPinSignalMapItem final : public IF_XmlSerializableObject
         };
 
         // Constructors / Destructor
-        explicit ComponentPinSignalMapItem(const Uuid& pin, const Uuid& signal,
-                                           PinDisplayType_t displayType) noexcept;
+        ComponentPinSignalMapItem() = delete;
+        ComponentPinSignalMapItem(const ComponentPinSignalMapItem& other) = delete;
+        ComponentPinSignalMapItem(const Uuid& pin, const Uuid& signal,
+                                  PinDisplayType_t displayType) noexcept;
         explicit ComponentPinSignalMapItem(const XmlDomElement& domElement) throw (Exception);
         ~ComponentPinSignalMapItem() noexcept;
 
@@ -77,20 +84,13 @@ class ComponentPinSignalMapItem final : public IF_XmlSerializableObject
         static QString displayTypeToString(PinDisplayType_t type) noexcept;
 
 
-    private:
-
-        // make some methods inaccessible...
-        ComponentPinSignalMapItem() = delete;
-        ComponentPinSignalMapItem(const ComponentPinSignalMapItem& other) = delete;
-        ComponentPinSignalMapItem& operator=(const ComponentPinSignalMapItem& rhs) = delete;
-
-        // Private Methods
+    private: // Methods
 
         /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Attributes
+    private: // Data
         Uuid mPinUuid;                      ///< must be valid
         Uuid mSignalUuid;                   ///< NULL if not connected to a signal
         PinDisplayType_t mDisplayType;

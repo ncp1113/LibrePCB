@@ -73,6 +73,8 @@ class LibraryCategory : public LibraryBaseElement
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         virtual XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
+        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
+        virtual bool checkAttributesValidity() const noexcept override;
 
         // General Library Category Attributes
         Uuid mParentUuid;

@@ -38,7 +38,11 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The PackagePad class
+ * @brief The PackagePad class represents one logical pad of a package
+ *
+ * Following information is considered as the "interface" of a pad and must therefore
+ * never be changed:
+ *  - UUID
  */
 class PackagePad final : public IF_XmlSerializableObject
 {
@@ -47,7 +51,9 @@ class PackagePad final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit PackagePad(const Uuid& uuid, const QString& name) noexcept;
+        PackagePad() = delete;
+        PackagePad(const PackagePad& other) = delete;
+        PackagePad(const Uuid& uuid, const QString& name) noexcept;
         explicit PackagePad(const XmlDomElement& domElement) throw (Exception);
         ~PackagePad() noexcept;
 
@@ -63,21 +69,17 @@ class PackagePad final : public IF_XmlSerializableObject
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
-
-    private:
-
-        // make some methods inaccessible...
-        PackagePad() = delete;
-        PackagePad(const PackagePad& other) = delete;
+        // Operator Overloadings
         PackagePad& operator=(const PackagePad& rhs) = delete;
 
-        // Private Methods
+
+    private: // Methods
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Pin Attributes
+    private: // Data
         Uuid mUuid;
         QString mName;
 };

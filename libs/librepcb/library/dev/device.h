@@ -37,7 +37,14 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The Device class
+ * @brief The Device class represents an instance of a component (a "real" component)
+ *
+ * Following information is considered as the "interface" of a device and must therefore
+ * never be changed:
+ *  - UUID
+ *  - Component UUID
+ *  - Package UUID
+ *  - Pad-signal-mapping
  */
 class Device final : public LibraryElement
 {
@@ -63,7 +70,7 @@ class Device final : public LibraryElement
         void setPackageUuid(const Uuid& uuid) noexcept {mPackageUuid = uuid;}
 
         // Pad-Signal-Map Methods
-        const QHash<Uuid, Uuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
+        const QMap<Uuid, Uuid>& getPadSignalMap() const noexcept {return mPadSignalMap;}
         Uuid getSignalOfPad(const Uuid& pad) const noexcept {return mPadSignalMap.value(pad);}
         void addPadSignalMapping(const Uuid& pad, const Uuid& signal) noexcept;
         void removePadSignalMapping(const Uuid& pad) noexcept;
@@ -76,9 +83,7 @@ class Device final : public LibraryElement
         static QString getLongElementName() noexcept {return QStringLiteral("device");}
 
 
-    private:
-
-        // Private Methods
+    private: // Methods
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -87,10 +92,10 @@ class Device final : public LibraryElement
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Attributes
+    private: // Data
         Uuid mComponentUuid;
         Uuid mPackageUuid;
-        QHash<Uuid, Uuid> mPadSignalMap; ///< key: pad, value: signal
+        QMap<Uuid, Uuid> mPadSignalMap; ///< key: pad, value: signal
 };
 
 /*****************************************************************************************

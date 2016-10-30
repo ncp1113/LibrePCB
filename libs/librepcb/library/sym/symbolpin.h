@@ -39,7 +39,11 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The SymbolPin class
+ * @brief The SymbolPin class represents one pin of a symbol
+ *
+ * Following information is considered as the "interface" of a pin and must therefore
+ * never be changed:
+ *  - UUID
  */
 class SymbolPin final : public IF_XmlSerializableObject
 {
@@ -48,8 +52,10 @@ class SymbolPin final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
-                           const Length& length, const Angle& rotation) noexcept;
+        SymbolPin() = delete;
+        SymbolPin(const SymbolPin& other) = delete;
+        SymbolPin(const Uuid& uuid, const QString& name, const Point& position,
+                  const Length& length, const Angle& rotation) noexcept;
         explicit SymbolPin(const XmlDomElement& domElement) throw (Exception);
         ~SymbolPin() noexcept;
 
@@ -71,20 +77,17 @@ class SymbolPin final : public IF_XmlSerializableObject
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
-    private:
-
-        // make some methods inaccessible...
-        SymbolPin() = delete;
-        SymbolPin(const SymbolPin& other) = delete;
+        // Operator Overloadings
         SymbolPin& operator=(const SymbolPin& rhs) = delete;
 
-        // Private Methods
+
+    private: // Methods
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Pin Attributes
+    private: // Data
         Uuid mUuid;
         QString mName;
         Point mPosition;

@@ -37,7 +37,7 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The FootprintPadSmt class
+ * @brief The FootprintPadSmt class represents a SMT footprint pad
  */
 class FootprintPadSmt final : public FootprintPad
 {
@@ -49,8 +49,10 @@ class FootprintPadSmt final : public FootprintPad
         enum class BoardSide_t { TOP, BOTTOM };
 
         // Constructors / Destructor
-        explicit FootprintPadSmt(const Uuid& padUuid, const Point& pos, const Angle& rot,
-                                 const Length& width, const Length& height, BoardSide_t side) noexcept;
+        FootprintPadSmt() = delete;
+        FootprintPadSmt(const FootprintPadSmt& other) = delete;
+        FootprintPadSmt(const Uuid& padUuid, const Point& pos, const Angle& rot,
+                        const Length& width, const Length& height, BoardSide_t side) noexcept;
         explicit FootprintPadSmt(const XmlDomElement& domElement) throw (Exception);
         ~FootprintPadSmt() noexcept;
 
@@ -69,25 +71,21 @@ class FootprintPadSmt final : public FootprintPad
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
+        // Operator Overloadings
+        FootprintPadSmt& operator=(const FootprintPadSmt& rhs) = delete;
+
         // Static Methods
         static BoardSide_t stringToBoardSide(const QString& side) throw (Exception);
         static QString boardSideToString(BoardSide_t side) noexcept;
 
 
-    private:
-
-        // make some methods inaccessible...
-        FootprintPadSmt() = delete;
-        FootprintPadSmt(const FootprintPadSmt& other) = delete;
-        FootprintPadSmt& operator=(const FootprintPadSmt& rhs) = delete;
-
-        // Private Methods
+    private: // Methods
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Pin Attributes
+    private: // Data
         BoardSide_t mBoardSide;
 };
 
