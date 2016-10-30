@@ -26,6 +26,8 @@ SOURCES += \
     common/categorylisteditorwidget.cpp \
     common/categorytreelabeltextbuilder.cpp \
     common/editorwidgetbase.cpp \
+    cmp/componenteditorwidget.cpp \
+    cmp/componentsymbolvarianteditorwidget.cpp \
     cmpcat/componentcategoryeditorwidget.cpp \
     pkg/packageeditorwidget.cpp \
     pkgcat/packagecategoryeditorwidget.cpp \
@@ -37,6 +39,8 @@ HEADERS += \
     common/categorylisteditorwidget.h \
     common/categorytreelabeltextbuilder.h \
     common/editorwidgetbase.h \
+    cmp/componenteditorwidget.h \
+    cmp/componentsymbolvarianteditorwidget.h \
     cmpcat/componentcategoryeditorwidget.h \
     pkg/packageeditorwidget.h \
     pkgcat/packagecategoryeditorwidget.h \
@@ -46,6 +50,8 @@ FORMS += \
     libraryeditor.ui \
     common/categorychooserdialog.ui \
     common/categorylisteditorwidget.ui \
+    cmp/componenteditorwidget.ui \
+    cmp/componentsymbolvarianteditorwidget.ui \
     cmpcat/componentcategoryeditorwidget.ui \
     pkg/packageeditorwidget.ui \
     pkgcat/packagecategoryeditorwidget.ui \
