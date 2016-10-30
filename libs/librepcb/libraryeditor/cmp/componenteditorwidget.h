@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_LIBRARYEDITOR_H
-#define LIBREPCB_LIBRARY_LIBRARYEDITOR_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_COMPONENTEDITORWIDGET_H
+#define LIBREPCB_LIBRARY_EDITOR_COMPONENTEDITORWIDGET_H
 
 /*****************************************************************************************
  *  Includes
@@ -26,61 +26,66 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcb/common/exceptions.h>
-#include <librepcb/common/if_schematiclayerprovider.h>
+#include <librepcb/common/fileio/filepath.h>
+#include "../common/editorwidgetbase.h"
+#include "../common/categorylisteditorwidget.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
-
-namespace workspace {
-class Workspace;
-}
-
 namespace library {
+
+class Component;
+
 namespace editor {
 
 namespace Ui {
-class LibraryEditor;
+class ComponentEditorWidget;
 }
 
 /*****************************************************************************************
- *  Class LibraryEditor
+ *  Class ComponentEditorWidget
  ****************************************************************************************/
 
 /**
- * @brief The LibraryEditor class
+ * @brief The ComponentEditorWidget class
  *
- * @todo this is only a stub class...
+ * @author ubruhin
+ * @date 2016-10-16
  */
-class LibraryEditor final : public QMainWindow, public IF_SchematicLayerProvider
+class ComponentEditorWidget final : public EditorWidgetBase
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        explicit LibraryEditor(workspace::Workspace& workspace) throw (Exception);
-        ~LibraryEditor() noexcept;
+        ComponentEditorWidget() = delete;
+        ComponentEditorWidget(const ComponentEditorWidget& other) = delete;
+        ComponentEditorWidget(workspace::Workspace& ws, LibraryEditor& editor,
+                              const FilePath& fp, QWidget* parent = nullptr) throw (Exception);
+        ~ComponentEditorWidget() noexcept;
 
-        // Getters
-
-        /**
-         * @copydoc librepcb::IF_SchematicLayerProvider::getSchematicLayer()
-         */
-        SchematicLayer* getSchematicLayer(int id) const noexcept override
-        {Q_UNUSED(id); return nullptr;} // TODO
+        // Operator Overloadings
+        ComponentEditorWidget& operator=(const ComponentEditorWidget& rhs) = delete;
 
 
-    private:
+    public slots:
 
-        // make some methods inaccessible...
-        LibraryEditor(const LibraryEditor& other);
-        LibraryEditor& operator=(const LibraryEditor& rhs);
+        bool save() noexcept override;
 
-        // Attributes
-        workspace::Workspace& mWorkspace;
-        Ui::LibraryEditor* mUi;
+
+    private: // Methods
+
+        void tblSignalsItemChanged(QTableWidgetItem* item) noexcept;
+
+
+    private: // Data
+
+        QScopedPointer<Ui::ComponentEditorWidget> mUi;
+        QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
+        QSharedPointer<Component> mComponent;
 };
 
 /*****************************************************************************************
@@ -91,4 +96,4 @@ class LibraryEditor final : public QMainWindow, public IF_SchematicLayerProvider
 } // namespace library
 } // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_LIBRARYEDITOR_H
+#endif // LIBREPCB_LIBRARY_EDITOR_COMPONENTEDITORWIDGET_H
