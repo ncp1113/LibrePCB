@@ -673,7 +673,7 @@ bool MainWindow::convertDevice(QSettings& outputSettings, const FilePath& filepa
                     if (pinName.contains("#")) pinName.truncate(pinName.indexOf("#"));
                     Uuid signalUuid = getOrCreateUuid(outputSettings, filepath, "gatepins_to_componentsignals", uuid.toStr(), gateName % pinName);
                     ComponentPinSignalMapItem* map = new ComponentPinSignalMapItem(pinUuid,
-                        signalUuid, ComponentPinSignalMapItem::PinDisplayType_t::COMPONENT_SIGNAL);
+                        signalUuid, CmpSigPinDisplayType::componentSignal());
                     item->addPinSignalMapItem(*map);
                 }
             }

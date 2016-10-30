@@ -46,7 +46,8 @@ HEADERS += \
     cmp/componentpinsignalmapitem.h \
     pkg/footprintpadpreviewgraphicsitem.h \
     pkg/footprintpreviewgraphicsitem.h \
-    library.h
+    library.h \
+    cmp/cmpsigpindisplaytype.h
 
 SOURCES += \
     cat/componentcategory.cpp \
@@ -73,5 +74,6 @@ SOURCES += \
     cmp/componentpinsignalmapitem.cpp \
     pkg/footprintpadpreviewgraphicsitem.cpp \
     pkg/footprintpreviewgraphicsitem.cpp \
-    library.cpp
+    library.cpp \
+    cmp/cmpsigpindisplaytype.cpp
 

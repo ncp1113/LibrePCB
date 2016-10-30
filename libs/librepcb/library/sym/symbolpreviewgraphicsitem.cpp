@@ -66,8 +66,7 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_SchematicLayerProv
 
         const ComponentSignal* signal = nullptr;
         const ComponentPinSignalMapItem* mapItem = nullptr;
-        ComponentPinSignalMapItem::PinDisplayType_t displayType =
-                ComponentPinSignalMapItem::PinDisplayType_t::PIN_NAME;
+        CmpSigPinDisplayType displayType = CmpSigPinDisplayType::pinName();
         if (mComponent) signal = mComponent->getSignalOfPin(symbVarUuid, symbVarItemUuid, pin->getUuid());
         if (mSymbVarItem) mapItem = mSymbVarItem->getPinSignalMapItemOfPin(pin->getUuid());
         if (mapItem) displayType = mapItem->getDisplayType();

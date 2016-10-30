@@ -97,24 +97,21 @@ QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
                                      bool returnPinNameIfEmpty) const noexcept
 {
     QString text;
-    using PinDisplayType_t = library::ComponentPinSignalMapItem::PinDisplayType_t;
-    switch (mPinSignalMapItem->getDisplayType())
-    {
-        case PinDisplayType_t::PIN_NAME:
-            text = mSymbolPin->getName(); break;
-        case PinDisplayType_t::COMPONENT_SIGNAL:
-            if (mComponentSignalInstance) {
-                text = mComponentSignalInstance->getCompSignal().getName();
+    library::CmpSigPinDisplayType displayType = mPinSignalMapItem->getDisplayType();
+    if (displayType == library::CmpSigPinDisplayType::pinName()) {
+        text = mSymbolPin->getName();
+    } else  if (displayType == library::CmpSigPinDisplayType::componentSignal()) {
+        if (mComponentSignalInstance) {
+            text = mComponentSignalInstance->getCompSignal().getName();
+        }
+    } else if (displayType == library::CmpSigPinDisplayType::netSignal()) {
+        if (mComponentSignalInstance) {
+            if (mComponentSignalInstance->getNetSignal()) {
+                text = mComponentSignalInstance->getNetSignal()->getName();
             }
-            break;
-        case PinDisplayType_t::NET_SIGNAL:
-            if (mComponentSignalInstance) {
-                if (mComponentSignalInstance->getNetSignal()) {
-                    text = mComponentSignalInstance->getNetSignal()->getName();
-                }
-            }
-            break;
-        default: break;
+        }
+    } else if (displayType != library::CmpSigPinDisplayType::none()) {
+        Q_ASSERT(false);
     }
     if (text.isEmpty() && returnCmpSignalNameIfEmpty && mComponentSignalInstance)
         text = mComponentSignalInstance->getCompSignal().getName();
