@@ -91,6 +91,7 @@ HEADERS += \
     network/networkrequestbase.h \
     network/networkaccessmanager.h \
     network/repository.h \
+    signalrole.h \
     toolbox.h
 
 SOURCES += \
@@ -148,6 +149,7 @@ SOURCES += \
     network/networkrequestbase.cpp \
     network/networkaccessmanager.cpp \
     network/repository.cpp \
+    signalrole.cpp \
     toolbox.cpp
 
 FORMS += \
