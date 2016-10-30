@@ -95,7 +95,11 @@ class WorkspaceLibraryDb final : public QObject
         // Getters: Special
         QSet<Uuid> getComponentCategoryChilds(const Uuid& parent) const throw (Exception);
         QSet<Uuid> getPackageCategoryChilds(const Uuid& parent) const throw (Exception);
+        QList<Uuid> getComponentCategoryParents(const Uuid& category) const throw (Exception);
+        QList<Uuid> getPackageCategoryParents(const Uuid& category) const throw (Exception);
+        QSet<Uuid> getSymbolsByCategory(const Uuid& category) const throw (Exception);
         QSet<Uuid> getComponentsByCategory(const Uuid& category) const throw (Exception);
+        QSet<Uuid> getDevicesByCategory(const Uuid& category) const throw (Exception);
         QSet<Uuid> getDevicesOfComponent(const Uuid& component) const throw (Exception);
 
         // General Methods
@@ -127,6 +131,8 @@ class WorkspaceLibraryDb final : public QObject
                                                                const Uuid& uuid) const throw (Exception);
         FilePath getLatestVersionFilePath(const QMultiMap<Version, FilePath>& list) const noexcept;
         QSet<Uuid> getCategoryChilds(const QString& tablename, const Uuid& categoryUuid) const throw (Exception);
+        QList<Uuid> getCategoryParents(const QString& tablename, Uuid category) const throw (Exception);
+        Uuid getCategoryParent(const QString& tablename, const Uuid& category) const throw (Exception);
         QSet<Uuid> getElementsByCategory(const QString& tablename, const QString& idrowname,
                                          const Uuid& categoryUuid) const throw (Exception);
         void createAllTables() throw (Exception);
