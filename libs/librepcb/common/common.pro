@@ -92,7 +92,8 @@ HEADERS += \
     network/networkaccessmanager.h \
     network/repository.h \
     signalrole.h \
-    toolbox.h
+    toolbox.h \
+    widgets/signalrolecombobox.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -150,7 +151,8 @@ SOURCES += \
     network/networkaccessmanager.cpp \
     network/repository.cpp \
     signalrole.cpp \
-    toolbox.cpp
+    toolbox.cpp \
+    widgets/signalrolecombobox.cpp
 
 FORMS += \
     dialogs/gridsettingsdialog.ui \
