@@ -38,7 +38,7 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The ComponentSignal class
+ * @brief The ComponentSignal class represents one signal of a component
  */
 class ComponentSignal final : public IF_XmlSerializableObject
 {
@@ -58,7 +58,9 @@ class ComponentSignal final : public IF_XmlSerializableObject
 
 
         // Constructors / Destructor
-        explicit ComponentSignal(const Uuid& uuid, const QString& name) noexcept;
+        ComponentSignal() = delete;
+        ComponentSignal(const ComponentSignal& other) = delete;
+        ComponentSignal(const Uuid& uuid, const QString& name) noexcept;
         explicit ComponentSignal(const XmlDomElement& domElement) throw (Exception);
         ~ComponentSignal() noexcept;
 
@@ -85,26 +87,21 @@ class ComponentSignal final : public IF_XmlSerializableObject
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
-
-    private:
-
-        // make some methods inaccessible...
-        ComponentSignal() = delete;
-        ComponentSignal(const ComponentSignal& other) = delete;
+        // Operator Overloadings
         ComponentSignal& operator=(const ComponentSignal& rhs) = delete;
 
-        // Private Methods
+
+    private: // Methods
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
-
 
         // Private Static Methods
         static SignalRole_t stringToSignalRole(const QString& role) throw (Exception);
         static QString signalRoleToString(SignalRole_t role) noexcept;
 
-
-        // Signal Attributes
+        
+    private: // Data
         Uuid mUuid;
         QString mName;
         SignalRole_t mRole;

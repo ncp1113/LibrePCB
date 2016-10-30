@@ -61,7 +61,7 @@ class Library final : public LibraryBaseElement
 
         // Getters
         const QUrl& getUrl() const noexcept {return mUrl;}
-        const QList<Uuid>& getDependencies() const noexcept {return mDependencies;}
+        const QSet<Uuid>& getDependencies() const noexcept {return mDependencies;}
         const QPixmap& getIcon() const noexcept {return mIcon;}
 
         // Setters
@@ -92,9 +92,8 @@ class Library final : public LibraryBaseElement
 
 
     private: // Data
-
         QUrl mUrl;
-        QList<Uuid> mDependencies;
+        QSet<Uuid> mDependencies;
         QPixmap mIcon;
 };
 

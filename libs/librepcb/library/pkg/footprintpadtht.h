@@ -36,7 +36,7 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The FootprintPadTht class
+ * @brief The FootprintPadTht class represents a THT footprint pad
  */
 class FootprintPadTht final : public FootprintPad
 {
@@ -48,9 +48,11 @@ class FootprintPadTht final : public FootprintPad
         enum class Shape_t { ROUND, RECT, OCTAGON };
 
         // Constructors / Destructor
-        explicit FootprintPadTht(const Uuid& padUuid, const Point& pos, const Angle& rot,
-                                 const Length& width, const Length& height,
-                                 Shape_t shape, const Length& drillDiameter) noexcept;
+        FootprintPadTht() = delete;
+        FootprintPadTht(const FootprintPadTht& other) = delete;
+        FootprintPadTht(const Uuid& padUuid, const Point& pos, const Angle& rot,
+                        const Length& width, const Length& height, Shape_t shape,
+                        const Length& drillDiameter) noexcept;
         explicit FootprintPadTht(const XmlDomElement& domElement) throw (Exception);
         ~FootprintPadTht() noexcept;
 
@@ -71,25 +73,21 @@ class FootprintPadTht final : public FootprintPad
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
+        // Operator Overloadings
+        FootprintPadTht& operator=(const FootprintPadTht& rhs) = delete;
+
         // Static Methods
         static Shape_t stringToShape(const QString& shape) throw (Exception);
         static QString shapeToString(Shape_t shape) noexcept;
 
 
-    private:
-
-        // make some methods inaccessible...
-        FootprintPadTht() = delete;
-        FootprintPadTht(const FootprintPadTht& other) = delete;
-        FootprintPadTht& operator=(const FootprintPadTht& rhs) = delete;
-
-        // Private Methods
+    private: // Methods
 
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Pin Attributes
+    private: // Data
         Shape_t mShape;
         Length mDrillDiameter;
 };

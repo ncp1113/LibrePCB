@@ -40,7 +40,19 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The Component class
+ * @brief The Component class represents a "generic" device in the library
+ *
+ * Following information is considered as the "interface" of a component and must
+ * therefore never be changed:
+ *  - UUID
+ *  - Property "is schematic only"
+ *  - All signal UUIDs (and their meaning)
+ *  - Symbol variants (adding new variants is allowed, but removing not)
+ *    - UUID
+ *    - Symbol items (neither adding nor removing items is allowed)
+ *      - UUID
+ *      - Symbol UUID
+ *      - Pin-signal-mapping
  */
 class Component final : public LibraryElement
 {
@@ -120,9 +132,7 @@ class Component final : public LibraryElement
         static QString getLongElementName() noexcept {return QStringLiteral("component");}
 
 
-    private:
-
-        // Private Methods
+    private: // Methods
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -131,7 +141,7 @@ class Component final : public LibraryElement
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Conponent Attributes
+    private: // Data
         bool mSchematicOnly; ///< if true, this component is schematic-only (no package)
         QList<LibraryElementAttribute*> mAttributes; ///< all attributes in a specific order
         QMap<QString, QString> mDefaultValues; ///< key: locale (like "en_US"), value: default value

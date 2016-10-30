@@ -39,7 +39,14 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The ComponentSymbolVariantItem class
+ * @brief The ComponentSymbolVariantItem class represents one symbol of a component symbol
+ *        variant
+ *
+ * Following information is considered as the "interface" of a symbol variant item and
+ * must therefore never be changed:
+ *  - UUID
+ *  - Symbol UUID
+ *  - Pin-signal-mapping
  */
 class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
 {
@@ -48,8 +55,10 @@ class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
     public:
 
         // Constructors / Destructor
-        explicit ComponentSymbolVariantItem(const Uuid& uuid, const Uuid& symbolUuid,
-                                            bool isRequired, const QString& suffix) noexcept;
+        ComponentSymbolVariantItem() = delete;
+        ComponentSymbolVariantItem(const ComponentSymbolVariantItem& other) = delete;
+        ComponentSymbolVariantItem(const Uuid& uuid, const Uuid& symbolUuid,
+                                   bool isRequired, const QString& suffix) noexcept;
         explicit ComponentSymbolVariantItem(const XmlDomElement& domElement) throw (Exception);
         ~ComponentSymbolVariantItem() noexcept;
 
@@ -58,6 +67,10 @@ class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
         const Uuid& getSymbolUuid() const noexcept {return mSymbolUuid;}
         bool isRequired() const noexcept {return mIsRequired;}
         const QString& getSuffix() const noexcept {return mSuffix;}
+
+        // Setters: Attributes
+        void setIsRequired(bool required) noexcept {mIsRequired = required;}
+        void setSuffix(const QString& suffix) noexcept {mSuffix = suffix;}
 
         // Pin-Signal-Map Methods
         const QMap<Uuid, ComponentPinSignalMapItem*>& getPinSignalMappings() noexcept {return mPinSignalMap;}
@@ -70,21 +83,17 @@ class ComponentSymbolVariantItem final : public IF_XmlSerializableObject
         /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
-
-    private:
-
-        // make some methods inaccessible...
-        ComponentSymbolVariantItem() = delete;
-        ComponentSymbolVariantItem(const ComponentSymbolVariantItem& other) = delete;
+        // Operator Overloadings
         ComponentSymbolVariantItem& operator=(const ComponentSymbolVariantItem& rhs) = delete;
 
-        // Private Methods
+
+    private: // Methods
 
         /// @copydoc #IF_XmlSerializableObject#checkAttributesValidity()
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Symbol Variant Item Attributes
+    private: // Data
         Uuid mUuid;
         Uuid mSymbolUuid;
         bool mIsRequired;

@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "libraryelement.h"
+#include <librepcb/common/toolbox.h>
 #include <librepcb/common/fileio/xmldomdocument.h>
 #include <librepcb/common/fileio/xmldomelement.h>
 
@@ -54,7 +55,7 @@ LibraryElement::LibraryElement(const FilePath& elementDirectory, const QString& 
     for (XmlDomElement* node = root.getFirstChild("meta/category", true, false);
          node; node = node->getNextSibling("category"))
     {
-        mCategories.append(node->getText<Uuid>(true));
+        mCategories.insert(node->getText<Uuid>(true));
     }
 }
 
@@ -69,7 +70,7 @@ LibraryElement::~LibraryElement() noexcept
 XmlDomElement* LibraryElement::serializeToXmlDomElement() const throw (Exception)
 {
     QScopedPointer<XmlDomElement> root(LibraryBaseElement::serializeToXmlDomElement());
-    foreach (const Uuid& uuid, mCategories) {
+    foreach (const Uuid& uuid, Toolbox::sortedQSet(mCategories)) {
         root->getFirstChild("meta", true)->appendTextChild("category", uuid);
     }
     return root.take();

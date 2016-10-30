@@ -40,9 +40,11 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The FootprintPad class
+ * @brief The FootprintPad class represents a pad of a footprint
  *
- * @todo add subclasses for each footprint type
+ * Following information is considered as the "interface" of a package and must therefore
+ * never be changed:
+ *  - UUID
  */
 class FootprintPad : public IF_XmlSerializableObject
 {
@@ -54,9 +56,10 @@ class FootprintPad : public IF_XmlSerializableObject
         enum class Technology_t { THT, SMT };
 
         // Constructors / Destructor
-        explicit FootprintPad(Technology_t technology, const Uuid& padUuid,
-                              const Point& pos, const Angle& rot, const Length& width,
-                              const Length& height) noexcept;
+        FootprintPad() = delete;
+        FootprintPad(const FootprintPad& other) = delete;
+        FootprintPad(Technology_t technology, const Uuid& padUuid, const Point& pos,
+                     const Angle& rot, const Length& width, const Length& height) noexcept;
         explicit FootprintPad(const XmlDomElement& domElement) throw (Exception);
         virtual ~FootprintPad() noexcept;
 
@@ -87,32 +90,23 @@ class FootprintPad : public IF_XmlSerializableObject
         /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
         virtual bool checkAttributesValidity() const noexcept override;
 
+        // Operator Overloadings
+        FootprintPad& operator=(const FootprintPad& rhs) = delete;
+
         // Static Methods
         static Technology_t stringToTechnology(const QString& technology) throw (Exception);
         static QString technologyToString(Technology_t technology) noexcept;
         static FootprintPad* fromDomElement(const XmlDomElement& domElement) throw (Exception);
 
 
-    private:
-
-        // make some methods inaccessible...
-        FootprintPad() = delete;
-        FootprintPad(const FootprintPad& other) = delete;
-        FootprintPad& operator=(const FootprintPad& rhs) = delete;
-
-
-    protected:
-
-        // Pin Attributes
+    protected: // Data
         Technology_t mTechnology;
         Uuid mUuid;
         Point mPosition;
         Angle mRotation;
         Length mWidth;
         Length mHeight;
-
-        // Cached Attributes
-        mutable QPainterPath mPainterPathPx;
+        mutable QPainterPath mPainterPathPx; // used for caching
 };
 
 /*****************************************************************************************

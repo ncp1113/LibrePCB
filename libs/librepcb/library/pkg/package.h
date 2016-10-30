@@ -39,7 +39,18 @@ namespace library {
  ****************************************************************************************/
 
 /**
- * @brief The Package class
+ * @brief The Package class represents a package of a component (including footprint and
+ *        3D model)
+ *
+ * Following information is considered as the "interface" of a package and must therefore
+ * never be changed:
+ *  - UUID
+ *  - Package pads (neither adding nor removing pads is allowed)
+ *    - UUID
+ *  - Footprints (adding new footprints is allowed, but removing not)
+ *    - UUID
+ *    - Footprint pads (neither adding nor removing pads is allowed)
+ *      - UUID
  */
 class Package final : public LibraryElement
 {
@@ -84,9 +95,7 @@ class Package final : public LibraryElement
         static QString getLongElementName() noexcept {return QStringLiteral("package");}
 
 
-    private:
-
-        // Private Methods
+    private: // Methods
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -95,7 +104,7 @@ class Package final : public LibraryElement
         bool checkAttributesValidity() const noexcept override;
 
 
-        // Attributes
+    private: // Data
         QMap<Uuid, PackagePad*> mPads; ///< empty if the package has no pads
         QMap<Uuid, Footprint*> mFootprints; ///< minimum one footprint
         Uuid mDefaultFootprintUuid; ///< points to one item of #mFootprints

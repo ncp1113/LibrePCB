@@ -71,6 +71,12 @@ XmlDomElement* LibraryCategory::serializeToXmlDomElement() const throw (Exceptio
     return root.take();
 }
 
+bool LibraryCategory::checkAttributesValidity() const noexcept
+{
+    if (mParentUuid == mUuid)   {return false;}
+    return true;
+}
+
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
