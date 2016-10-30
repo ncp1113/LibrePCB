@@ -21,8 +21,7 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "componentpinsignalmapitem.h"
-#include <librepcb/common/fileio/xmldomelement.h>
+#include "cmpsigpindisplaytype.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -34,50 +33,70 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-ComponentPinSignalMapItem::ComponentPinSignalMapItem(const Uuid& pin, const Uuid& signal,
-                                                     const CmpSigPinDisplayType& displayType) noexcept :
-    mPinUuid(pin), mSignalUuid(signal), mDisplayType(displayType)
+CmpSigPinDisplayType::CmpSigPinDisplayType() noexcept :
+    CmpSigPinDisplayType(componentSignal())
 {
 }
 
-ComponentPinSignalMapItem::ComponentPinSignalMapItem(const XmlDomElement& domElement) throw (Exception)
-{
-    // read attributes
-    mPinUuid = domElement.getAttribute<Uuid>("pin", true);
-    mDisplayType = CmpSigPinDisplayType::fromString(
-                       domElement.getAttribute<QString>("display", true));
-    mSignalUuid = domElement.getText<Uuid>(false);
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-}
-
-ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept
+CmpSigPinDisplayType::CmpSigPinDisplayType(const QString& type, const QString& name) noexcept :
+    mDisplayType(type), mName(name)
 {
 }
 
-/*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-XmlDomElement* ComponentPinSignalMapItem::serializeToXmlDomElement() const throw (Exception)
+CmpSigPinDisplayType::CmpSigPinDisplayType(const CmpSigPinDisplayType& other) noexcept :
+    mDisplayType(other.mDisplayType), mName(other.mName)
 {
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+}
 
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("map"));
-    root->setAttribute("pin", mPinUuid);
-    root->setAttribute<QString>("display", mDisplayType.toString());
-    root->setText(mSignalUuid);
-    return root.take();
+CmpSigPinDisplayType::~CmpSigPinDisplayType() noexcept
+{
 }
 
 /*****************************************************************************************
- *  Private Methods
+ *  Operator Overloadings
  ****************************************************************************************/
 
-bool ComponentPinSignalMapItem::checkAttributesValidity() const noexcept
+CmpSigPinDisplayType& CmpSigPinDisplayType::operator=(const CmpSigPinDisplayType& rhs) noexcept
 {
-    if (mPinUuid.isNull())  return false;
-    return true;
+    mDisplayType = rhs.mDisplayType;
+    mName = rhs.mName;
+    return *this;
+}
+
+bool CmpSigPinDisplayType::operator==(const CmpSigPinDisplayType& rhs) noexcept
+{
+    return mDisplayType == rhs.mDisplayType;
+}
+
+bool CmpSigPinDisplayType::operator!=(const CmpSigPinDisplayType& rhs) noexcept
+{
+    return mDisplayType != rhs.mDisplayType;
+}
+
+/*****************************************************************************************
+ *  Static Methods
+ ****************************************************************************************/
+
+const CmpSigPinDisplayType& CmpSigPinDisplayType::fromString(const QString& str) throw (Exception)
+{
+    foreach (const CmpSigPinDisplayType& type, getAllTypes()) {
+        if (type.toString() == str) {
+            return type;
+        }
+    }
+    throw RuntimeError(__FILE__, __LINE__, QString(),
+        QString(tr("Invalid component signal pin display type: \"%1\"")).arg(str));
+}
+
+const QList<CmpSigPinDisplayType>& CmpSigPinDisplayType::getAllTypes() noexcept
+{
+    static QList<CmpSigPinDisplayType> list{
+        none(),
+        pinName(),
+        componentSignal(),
+        netSignal(),
+    };
+    return list;
 }
 
 /*****************************************************************************************
@@ -86,3 +105,4 @@ bool ComponentPinSignalMapItem::checkAttributesValidity() const noexcept
 
 } // namespace library
 } // namespace librepcb
+

@@ -26,6 +26,7 @@
 #include <QtCore>
 #include <librepcb/common/uuid.h>
 #include <librepcb/common/fileio/if_xmlserializableobject.h>
+#include "cmpsigpindisplaytype.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -51,37 +52,25 @@ class ComponentPinSignalMapItem final : public IF_XmlSerializableObject
 
     public:
 
-        /// Pin Display Type Enum
-        enum class PinDisplayType_t {
-            NONE,               ///< no text
-            PIN_NAME,           ///< display the name of the symbol pin
-            COMPONENT_SIGNAL,   ///< display the name of the component signal
-            NET_SIGNAL          ///< display the name of the connected net signal
-        };
-
         // Constructors / Destructor
         ComponentPinSignalMapItem() = delete;
         ComponentPinSignalMapItem(const ComponentPinSignalMapItem& other) = delete;
         ComponentPinSignalMapItem(const Uuid& pin, const Uuid& signal,
-                                  PinDisplayType_t displayType) noexcept;
+                                  const CmpSigPinDisplayType& displayType) noexcept;
         explicit ComponentPinSignalMapItem(const XmlDomElement& domElement) throw (Exception);
         ~ComponentPinSignalMapItem() noexcept;
 
         // Getters
         const Uuid& getPinUuid() const noexcept {return mPinUuid;}
         const Uuid& getSignalUuid() const noexcept {return mSignalUuid;}
-        PinDisplayType_t getDisplayType() const noexcept {return mDisplayType;}
+        const CmpSigPinDisplayType& getDisplayType() const noexcept {return mDisplayType;}
 
         // Setters
         void setSignalUuid(const Uuid& uuid) noexcept {mSignalUuid = uuid;}
-        void setDisplayType(PinDisplayType_t type) noexcept {mDisplayType = type;}
+        void setDisplayType(const CmpSigPinDisplayType& type) noexcept {mDisplayType = type;}
 
         /// @copydoc #IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
-
-        // Static Methods
-        static PinDisplayType_t stringToDisplayType(const QString& type) throw (Exception);
-        static QString displayTypeToString(PinDisplayType_t type) noexcept;
 
 
     private: // Methods
@@ -93,7 +82,7 @@ class ComponentPinSignalMapItem final : public IF_XmlSerializableObject
     private: // Data
         Uuid mPinUuid;                      ///< must be valid
         Uuid mSignalUuid;                   ///< NULL if not connected to a signal
-        PinDisplayType_t mDisplayType;
+        CmpSigPinDisplayType mDisplayType;
 };
 
 /*****************************************************************************************

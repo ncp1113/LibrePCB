@@ -26,7 +26,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <librepcb/common/graphics/graphicsitem.h>
-#include "../cmp/componentsymbolvariantitem.h"
+#include "../cmp/cmpsigpindisplaytype.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -55,12 +55,9 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
 {
     public:
 
-        // Types
-        using PinDisplayType_t = ComponentPinSignalMapItem::PinDisplayType_t;
-
         // Constructors / Destructor
         explicit SymbolPinPreviewGraphicsItem(const IF_SchematicLayerProvider& layerProvider,
-            const SymbolPin& pin, const ComponentSignal* compSignal, PinDisplayType_t displayType) noexcept;
+            const SymbolPin& pin, const ComponentSignal* compSignal, const CmpSigPinDisplayType& displayType) noexcept;
         ~SymbolPinPreviewGraphicsItem() noexcept;
 
         // Setters
@@ -86,7 +83,7 @@ class SymbolPinPreviewGraphicsItem final : public GraphicsItem
         // General Attributes
         const SymbolPin& mPin;
         const ComponentSignal* mComponentSignal;
-        PinDisplayType_t mDisplayType;
+        CmpSigPinDisplayType mDisplayType;
         SchematicLayer* mCircleLayer;
         SchematicLayer* mLineLayer;
         SchematicLayer* mTextLayer;
