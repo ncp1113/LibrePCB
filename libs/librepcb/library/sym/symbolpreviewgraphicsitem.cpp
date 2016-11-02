@@ -47,7 +47,7 @@ SymbolPreviewGraphicsItem::SymbolPreviewGraphicsItem(const IF_SchematicLayerProv
                                                      const Component* cmp,
                                                      const Uuid& symbVarUuid,
                                                      const Uuid& symbVarItemUuid) noexcept :
-    GraphicsItem(), mLayerProvider(layerProvider), mSymbol(symbol), mComponent(cmp),
+    QGraphicsItem(), mLayerProvider(layerProvider), mSymbol(symbol), mComponent(cmp),
     mSymbVarItem(nullptr), mDrawBoundingRect(false), mLocaleOrder(localeOrder)
 {
     if (mComponent)

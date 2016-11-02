@@ -47,7 +47,6 @@ HEADERS += \
     fileio/smartxmlfile.h \
     fileio/xmldomdocument.h \
     fileio/xmldomelement.h \
-    graphics/graphicsitem.h \
     graphics/graphicsscene.h \
     graphics/graphicsview.h \
     graphics/if_graphicsvieweventhandler.h \
@@ -112,7 +111,6 @@ SOURCES += \
     fileio/smartxmlfile.cpp \
     fileio/xmldomdocument.cpp \
     fileio/xmldomelement.cpp \
-    graphics/graphicsitem.cpp \
     graphics/graphicsscene.cpp \
     graphics/graphicsview.cpp \
     units/angle.cpp \
