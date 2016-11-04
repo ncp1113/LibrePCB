@@ -23,7 +23,6 @@
 #include <QtCore>
 #include <QtWidgets>
 #include "boardlayer.h"
-#include "fileio/xmldomelement.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -34,29 +33,20 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-BoardLayer::BoardLayer(const BoardLayer& other) throw (Exception) :
-    QObject(0), mId(other.mId), mName(other.mName), mColor(other.mColor),
-    mColorHighlighted(other.mColorHighlighted), mIsVisible(other.mIsVisible)
+BoardLayer::BoardLayer(const BoardLayer& other) noexcept :
+    Layer(other)
 {
 }
 
 BoardLayer::BoardLayer(const XmlDomElement& domElement) throw (Exception) :
-    QObject(0), mId(-1), mName(), mColor(), mColorHighlighted(), mIsVisible(false)
+    Layer(domElement)
 {
-    mId = domElement.getAttribute<uint>("id", true);
-    mName = domElement.getText<QString>(true);
-    mColor = domElement.getAttribute<QColor>("color", true);
-    mColorHighlighted = domElement.getAttribute<QColor>("color_hl", true);
-    mIsVisible = domElement.getAttribute<bool>("visible", true);
 }
 
-BoardLayer::BoardLayer(int id) :
-    QObject(0), mId(id), mName(), mColor(), mColorHighlighted(), mIsVisible(false)
+BoardLayer::BoardLayer(int id) noexcept :
+    Layer(id, "Unknown", Qt::white, Qt::white, Qt::SolidPattern, false)
 {
-    Q_ASSERT(mId >= 0);
-
-    switch (mId)
-    {
+    switch (mId) {
         case Grid:
             mName = tr("Grid");
             mColor = Qt::white;                 // background
@@ -324,43 +314,8 @@ BoardLayer::BoardLayer(int id) :
     }
 }
 
-BoardLayer::~BoardLayer()
+BoardLayer::~BoardLayer() noexcept
 {
-}
-
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-const QColor& BoardLayer::getColor(bool highlighted) const
-{
-    return highlighted ? mColorHighlighted : mColor;
-}
-
-/*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-XmlDomElement* BoardLayer::serializeToXmlDomElement() const throw (Exception)
-{
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-    QScopedPointer<XmlDomElement> root(new XmlDomElement("layer"));
-    root->setAttribute("id", mId);
-    root->setText(mName);
-    root->setAttribute("color", mColor);
-    root->setAttribute("color_hl", mColorHighlighted);
-    root->setAttribute("visible", mIsVisible);
-    return root.take();
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-bool BoardLayer::checkAttributesValidity() const noexcept
-{
-    return true;
 }
 
 /*****************************************************************************************
@@ -374,12 +329,13 @@ bool BoardLayer::isCopperLayer(int id) noexcept
 
 int BoardLayer::getMirroredLayerId(int id) noexcept
 {
-    if ((id >= _TOP_LAYERS_START) && (id <= _TOP_LAYERS_END))
+    if ((id >= _TOP_LAYERS_START) && (id <= _TOP_LAYERS_END)) {
         return _BOTTOM_LAYERS_START + (_TOP_LAYERS_END - id);
-    else if ((id >= _BOTTOM_LAYERS_START) && (id <= _BOTTOM_LAYERS_END))
+    } else if ((id >= _BOTTOM_LAYERS_START) && (id <= _BOTTOM_LAYERS_END)) {
         return _TOP_LAYERS_END - (id - _BOTTOM_LAYERS_START);
-    else
+    } else {
         return id; // Layer cannot be mirrored
+    }
 }
 
 /*****************************************************************************************

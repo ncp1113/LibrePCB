@@ -92,7 +92,8 @@ HEADERS += \
     network/repository.h \
     signalrole.h \
     toolbox.h \
-    widgets/signalrolecombobox.h
+    widgets/signalrolecombobox.h \
+    layer.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -150,7 +151,8 @@ SOURCES += \
     network/repository.cpp \
     signalrole.cpp \
     toolbox.cpp \
-    widgets/signalrolecombobox.cpp
+    widgets/signalrolecombobox.cpp \
+    layer.cpp
 
 FORMS += \
     dialogs/gridsettingsdialog.ui \

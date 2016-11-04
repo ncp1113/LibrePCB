@@ -25,6 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
+#include "layer.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -37,10 +38,8 @@ namespace librepcb {
 
 /**
  * @brief The SchematicLayer class
- *
- * @note See @ref doc_schematic_layers for more information about the whole concept.
  */
-class SchematicLayer final : public QObject
+class SchematicLayer final : public Layer
 {
         Q_OBJECT
 
@@ -83,58 +82,12 @@ class SchematicLayer final : public QObject
         };
 
         // Constructors / Destructor
-        explicit SchematicLayer(int id);
-        ~SchematicLayer();
-
-        // Getters
-        int getId() const {return mId;}
-        const QString& getName() const {return mName;}
-        const QColor& getColor(bool highlighted = false) const;
-        bool isVisible() const noexcept {return mIsVisible;}
-
-
-    private:
-
-        // make some methods inaccessible...
-        SchematicLayer();
-        SchematicLayer(const SchematicLayer& other);
-        SchematicLayer& operator=(const SchematicLayer& rhs);
-
-        // Attributes
-        int mId;
-        QString mName;
-        QColor mColor;
-        QColor mColorHighlighted;
-        bool mIsVisible;
+        SchematicLayer() = delete;
+        explicit SchematicLayer(const SchematicLayer& other) noexcept;
+        explicit SchematicLayer(const XmlDomElement& domElement) throw (Exception);
+        explicit SchematicLayer(int id) noexcept;
+        ~SchematicLayer() noexcept;
 };
-
-/*****************************************************************************************
- *  Doxygen Documentation
- ****************************************************************************************/
-
-/**
-    @page doc_schematic_layers Schematic Layers Documentation
-
-    @tableofcontents
-
-    @section doc_schematic_layer_class Class SchematicLayer
-        The class #SchematicLayer is used to representate symbol/schematic layers. for
-        each layer you need to create an object of that type.
-
-    @section doc_schematic_layer_attributes Layer Attributes
-        Each schematic layer has the following attibutes:
-            - ID: An unsigned integer which identifies the layer (must be unique)
-            - Name: The name of the layer (translated into the user's language)
-            - Color: The color which is used to draw elements of that layer
-            - Color (highlighted): The color for highlighted (selected) elements
-            - Visible: Defines whether the layer is visible (true) or not (false)
-
-    @section doc_schematic_layer_ids Layer IDs
-        All available layers are listed in SchematicLayer#LayerID.
-
-    @todo Add more details
-
-*/
 
 /*****************************************************************************************
  *  End of File
