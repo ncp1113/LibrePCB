@@ -90,7 +90,8 @@ HEADERS += \
     network/networkrequest.h \
     network/networkrequestbase.h \
     network/networkaccessmanager.h \
-    network/repository.h
+    network/repository.h \
+    toolbox.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -146,7 +147,8 @@ SOURCES += \
     network/networkrequest.cpp \
     network/networkrequestbase.cpp \
     network/networkaccessmanager.cpp \
-    network/repository.cpp
+    network/repository.cpp \
+    toolbox.cpp
 
 FORMS += \
     dialogs/gridsettingsdialog.ui \
