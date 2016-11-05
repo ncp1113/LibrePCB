@@ -93,7 +93,8 @@ HEADERS += \
     signalrole.h \
     toolbox.h \
     widgets/signalrolecombobox.h \
-    layer.h
+    layer.h \
+    if_layerprovider.h
 
 SOURCES += \
     attributes/attributetype.cpp \
