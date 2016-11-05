@@ -33,7 +33,11 @@ SOURCES += \
     lib/libraryoverviewwidget.cpp \
     pkg/packageeditorwidget.cpp \
     pkgcat/packagecategoryeditorwidget.cpp \
-    sym/symboleditorwidget.cpp
+    sym/symboleditorwidget.cpp \
+    sym/fsm/symboleditorstate.cpp \
+    sym/fsm/symboleditorfsm.cpp \
+    sym/fsm/symboleditorstate_select.cpp \
+    sym/fsm/cmd/cmdmoveselectedsymbolitems.cpp
 
 HEADERS += \
     libraryeditor.h \
@@ -48,7 +52,11 @@ HEADERS += \
     lib/libraryoverviewwidget.h \
     pkg/packageeditorwidget.h \
     pkgcat/packagecategoryeditorwidget.h \
-    sym/symboleditorwidget.h
+    sym/symboleditorwidget.h \
+    sym/fsm/symboleditorstate.h \
+    sym/fsm/symboleditorfsm.h \
+    sym/fsm/symboleditorstate_select.h \
+    sym/fsm/cmd/cmdmoveselectedsymbolitems.h
 
 FORMS += \
     libraryeditor.ui \

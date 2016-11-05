@@ -27,8 +27,12 @@
 #include <librepcb/common/gridproperties.h>
 #include <librepcb/common/graphics/graphicsscene.h>
 #include <librepcb/library/sym/symbol.h>
+#include <librepcb/library/sym/symbolgraphicsitem.h>
+#include <librepcb/library/cmp/cmpsigpindisplaytype.h>
 #include <librepcb/workspace/workspace.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
+#include "../libraryeditor.h"
+#include "fsm/symboleditorfsm.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -71,6 +75,20 @@ SymbolEditorWidget::SymbolEditorWidget(workspace::Workspace& ws, LibraryEditor& 
     mUi->edtVersion->setText(mSymbol->getVersion().toStr());
     mCategoriesEditorWidget->setUuids(mSymbol->getCategories());
     mUi->cbxDeprecated->setChecked(mSymbol->isDeprecated());
+
+    // load graphics item
+    mGraphicsItem.reset(new SymbolGraphicsItem(*mSymbol, editor));
+    mGraphicsScene->addItem(*mGraphicsItem);
+    mUi->graphicsView->zoomAll();
+
+    // load finite state machine (FSM)
+    SymbolEditorState::Context fsmContext {
+        *this, *mUndoStack, *mGraphicsScene, *mSymbol, *mGraphicsItem
+    };
+    mFsm.reset(new SymbolEditorFsm(fsmContext));
+
+    // last but not least, connect the graphics scene events with the FSM
+    mUi->graphicsView->setEventHandlerObject(this);
 }
 
 SymbolEditorWidget::~SymbolEditorWidget() noexcept
@@ -111,6 +129,34 @@ bool SymbolEditorWidget::save() noexcept
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
+
+bool SymbolEditorWidget::graphicsViewEventHandler(QEvent* event) noexcept
+{
+    Q_ASSERT(event);
+    switch (event->type()) {
+        case QEvent::GraphicsSceneMouseMove: {
+            auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event); Q_ASSERT(e);
+            return mFsm->processGraphicsSceneMouseMoved(*e);
+        }
+        case QEvent::GraphicsSceneMousePress: {
+            auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event); Q_ASSERT(e);
+            switch (e->button()) {
+                case Qt::LeftButton: return mFsm->processGraphicsSceneLeftMouseButtonPressed(*e);
+                default: return false;
+            }
+        }
+        case QEvent::GraphicsSceneMouseRelease: {
+            auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event); Q_ASSERT(e);
+            switch (e->button()) {
+                case Qt::LeftButton: return mFsm->processGraphicsSceneLeftMouseButtonReleased(*e);
+                default: return false;
+            }
+        }
+        default: {
+            return false;
+        }
+    }
+}
 
 /*****************************************************************************************
  *  End of File

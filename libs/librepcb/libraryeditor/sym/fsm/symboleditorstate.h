@@ -17,26 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORWIDGET_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_H
+#define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
-#include "../common/editorwidgetbase.h"
-#include "../common/categorylisteditorwidget.h"
+#include <librepcb/common/units/all_length_units.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class GridProperties;
+class UndoStack;
 class GraphicsScene;
 
 namespace library {
@@ -46,61 +42,52 @@ class SymbolGraphicsItem;
 
 namespace editor {
 
-class SymbolEditorFsm;
-
-namespace Ui {
 class SymbolEditorWidget;
-}
 
 /*****************************************************************************************
- *  Class SymbolEditorWidget
+ *  Class SymbolEditorState
  ****************************************************************************************/
 
 /**
- * @brief The SymbolEditorWidget class
+ * @brief The SymbolEditorState class is the base class of all symbol editor FSM states
  *
- * @author ubruhin
- * @date 2016-10-16
+ * @author  ubruhin
+ * @date    2016-11-01
  */
-class SymbolEditorWidget final : public EditorWidgetBase, public IF_GraphicsViewEventHandler
+class SymbolEditorState
 {
-        Q_OBJECT
-
     public:
 
+        // Types
+        struct Context {
+            SymbolEditorWidget& editorWidget;
+            UndoStack& undoStack;
+            GraphicsScene& graphicsScene;
+            Symbol& symbol;
+            SymbolGraphicsItem& symbolGraphicsItem;
+        };
+
         // Constructors / Destructor
-        SymbolEditorWidget() = delete;
-        SymbolEditorWidget(const SymbolEditorWidget& other) = delete;
-        SymbolEditorWidget(workspace::Workspace& ws, LibraryEditor& editor,
-                           const FilePath& fp, QWidget* parent = nullptr) throw (Exception);
-        ~SymbolEditorWidget() noexcept;
+        SymbolEditorState() = delete;
+        SymbolEditorState(const SymbolEditorState& other) = delete;
+        explicit SymbolEditorState(const Context& context) noexcept;
+        virtual ~SymbolEditorState() noexcept;
+
+        // General Methods
+        virtual bool entry() noexcept {return true;}
+        virtual bool exit() noexcept {return true;}
+
+        // Event Handlers
+        virtual bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept = 0;
+        virtual bool processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept = 0;
+        virtual bool processGraphicsSceneLeftMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept = 0;
 
         // Operator Overloadings
-        SymbolEditorWidget& operator=(const SymbolEditorWidget& rhs) = delete;
+        SymbolEditorState& operator=(const SymbolEditorState& rhs) = delete;
 
 
-    public slots:
-
-        bool save() noexcept override;
-
-
-    private: // Methods
-
-        /**
-         * @copydoc librepcb::IF_GraphicsViewEventHandler::graphicsViewEventHandler()
-         */
-        bool graphicsViewEventHandler(QEvent* event) noexcept override;
-
-
-    private: // Data
-
-        QScopedPointer<Ui::SymbolEditorWidget> mUi;
-        QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
-        QScopedPointer<GridProperties> mGridProperties;
-        QScopedPointer<GraphicsScene> mGraphicsScene;
-        QSharedPointer<Symbol> mSymbol;
-        QScopedPointer<SymbolGraphicsItem> mGraphicsItem;
-        QSharedPointer<SymbolEditorFsm> mFsm;
+    protected: // Data
+        Context mContext;
 };
 
 /*****************************************************************************************
@@ -111,4 +98,4 @@ class SymbolEditorWidget final : public EditorWidgetBase, public IF_GraphicsView
 } // namespace library
 } // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORWIDGET_H
+#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_H
