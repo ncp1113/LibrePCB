@@ -93,6 +93,7 @@ HEADERS += \
     signalrole.h \
     toolbox.h \
     widgets/signalrolecombobox.h \
+    graphics/ellipsegraphicsitem.h \
     layer.h \
     if_layerprovider.h
 
@@ -153,6 +154,7 @@ SOURCES += \
     signalrole.cpp \
     toolbox.cpp \
     widgets/signalrolecombobox.cpp \
+    graphics/ellipsegraphicsitem.cpp \
     layer.cpp
 
 FORMS += \
