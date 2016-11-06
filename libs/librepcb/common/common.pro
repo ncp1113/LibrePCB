@@ -94,7 +94,12 @@ HEADERS += \
     toolbox.h \
     widgets/signalrolecombobox.h \
     layer.h \
-    if_layerobserver.h
+    if_layerobserver.h \
+    graphics/ellipsegraphicsitem.h \
+    graphics/linegraphicsitem.h \
+    graphics/pathgraphicsitem.h \
+    graphics/textgraphicsitem.h \
+    graphics/origincrossgraphicsitem.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -153,7 +158,12 @@ SOURCES += \
     signalrole.cpp \
     toolbox.cpp \
     widgets/signalrolecombobox.cpp \
-    layer.cpp
+    layer.cpp \
+    graphics/ellipsegraphicsitem.cpp \
+    graphics/linegraphicsitem.cpp \
+    graphics/pathgraphicsitem.cpp \
+    graphics/textgraphicsitem.cpp \
+    graphics/origincrossgraphicsitem.cpp
 
 FORMS += \
     dialogs/gridsettingsdialog.ui \
