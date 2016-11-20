@@ -69,7 +69,8 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, QSharedPointer<Library> l
     addSchematicLayer(SchematicLayer::LayerID::OriginCrosses);
     addSchematicLayer(SchematicLayer::LayerID::SymbolOutlines);
     addSchematicLayer(SchematicLayer::LayerID::SymbolGrabAreas);
-    addSchematicLayer(SchematicLayer::LayerID::SymbolPinCircles);
+    addSchematicLayer(SchematicLayer::LayerID::SymbolOptionalPinCircles);
+    addSchematicLayer(SchematicLayer::LayerID::SymbolRequiredPinCircles);
     addSchematicLayer(SchematicLayer::LayerID::SymbolPinNames);
     addSchematicLayer(SchematicLayer::LayerID::ComponentNames);
     addSchematicLayer(SchematicLayer::LayerID::ComponentValues);

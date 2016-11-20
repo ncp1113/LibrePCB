@@ -25,7 +25,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include "fileio/if_xmlserializableobject.h"
+#include "layer.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -39,12 +39,10 @@ namespace librepcb {
 /**
  * @brief The BoardLayer class
  *
- * @note See @ref doc_board_layers for more information about the whole concept.
- *
  * @author ubruhin
  * @date 2015-06-05
  */
-class BoardLayer final : public QObject, public IF_XmlSerializableObject
+class BoardLayer final : public Layer
 {
         Q_OBJECT
 
@@ -213,25 +211,14 @@ class BoardLayer final : public QObject, public IF_XmlSerializableObject
 
         // Constructors / Destructor
         BoardLayer() = delete;
-        explicit BoardLayer(const BoardLayer& other) throw (Exception);
+        explicit BoardLayer(const BoardLayer& other) noexcept;
         explicit BoardLayer(const XmlDomElement& domElement) throw (Exception);
-        explicit BoardLayer(int id);
-        ~BoardLayer();
+        explicit BoardLayer(int id) noexcept;
+        ~BoardLayer() noexcept;
 
         // Getters
-        int getId() const {return mId;}
-        const QString& getName() const {return mName;}
-        const QColor& getColor(bool highlighted = false) const;
-        bool isVisible() const noexcept {return mIsVisible;}
         bool isCopperLayer() const noexcept {return isCopperLayer(mId);}
         int getMirroredLayerId() const noexcept {return getMirroredLayerId(mId);}
-
-        // Setters
-        void setVisible(bool visible) noexcept {mIsVisible = visible; emit attributesChanged();}
-
-        // General Methods
-        /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
-        XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
 
         // Operator Overloadings
         BoardLayer& operator=(const BoardLayer& rhs) = delete;
@@ -239,54 +226,7 @@ class BoardLayer final : public QObject, public IF_XmlSerializableObject
         // Static Methods
         static bool isCopperLayer(int id) noexcept;
         static int getMirroredLayerId(int id) noexcept;
-
-
-    signals:
-
-        void attributesChanged();
-
-
-    private:
-
-        /// @copydoc IF_XmlSerializableObject#checkAttributesValidity()
-        bool checkAttributesValidity() const noexcept override;
-
-
-        // Attributes
-        int mId;
-        QString mName;
-        QColor mColor;
-        QColor mColorHighlighted;
-        bool mIsVisible;
 };
-
-/*****************************************************************************************
- *  Doxygen Documentation
- ****************************************************************************************/
-
-/**
-    @page doc_board_layers Board Layers Documentation
-
-    @tableofcontents
-
-    @section doc_board_layer_class Class BoardLayer
-        The class #BoardLayer is used to representate footprint/board layers. for
-        each layer you need to create an object of that type.
-
-    @section doc_board_layer_attributes Layer Attributes
-        Each board layer has the following attibutes:
-            - ID: An unsigned integer which identifies the layer (must be unique)
-            - Name: The name of the layer (translated into the user's language)
-            - Color: The color which is used to draw elements of that layer
-            - Color (highlighted): The color for highlighted (selected) elements
-            - Visible: Defines whether the layer is visible (true) or not (false)
-
-    @section doc_board_layer_ids Layer IDs
-        All available layers are listed in BoardLayer#LayerID.
-
-    @todo Add more details
-
-*/
 
 /*****************************************************************************************
  *  End of File

@@ -47,7 +47,11 @@ SymbolPinPreviewGraphicsItem::SymbolPinPreviewGraphicsItem(
 {
     setToolTip(mPin.getName());
 
-    mCircleLayer = layerProvider.getSchematicLayer(SchematicLayer::SymbolPinCircles);
+    if (mComponentSignal && mComponentSignal->isRequired()) {
+        mCircleLayer = layerProvider.getSchematicLayer(SchematicLayer::SymbolRequiredPinCircles);
+    } else {
+        mCircleLayer = layerProvider.getSchematicLayer(SchematicLayer::SymbolOptionalPinCircles);
+    }
     Q_ASSERT(mCircleLayer);
     mLineLayer = layerProvider.getSchematicLayer(SchematicLayer::SymbolOutlines);
     Q_ASSERT(mLineLayer);
@@ -132,15 +136,13 @@ void SymbolPinPreviewGraphicsItem::paint(QPainter* painter, const QStyleOptionGr
     Q_UNUSED(widget);
     const bool selected = option->state.testFlag(QStyle::State_Selected);
 
-    bool requiredPin = mComponentSignal ? mComponentSignal->isRequired() : false;
-
     // draw line
     QPen pen(mLineLayer->getColor(selected), Length(158750).toPx(), Qt::SolidLine, Qt::RoundCap);
     painter->setPen(pen);
     painter->drawLine(QPointF(0, 0), Point(mPin.getLength(), 0).toPxQPointF());
 
     // draw circle
-    painter->setPen(QPen(mCircleLayer->getColor(requiredPin), 0));
+    painter->setPen(QPen(mCircleLayer->getColor(selected), 0));
     painter->setBrush(Qt::NoBrush);
     painter->drawEllipse(QPointF(0, 0), mRadiusPx, mRadiusPx);
 

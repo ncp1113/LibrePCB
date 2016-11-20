@@ -33,13 +33,20 @@ namespace librepcb {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SchematicLayer::SchematicLayer(int id) :
-    QObject(0), mId(id), mName(), mColor(), mColorHighlighted(), mIsVisible(false)
+SchematicLayer::SchematicLayer(const SchematicLayer& other) noexcept :
+    Layer(other)
 {
-    Q_ASSERT(mId >= 0);
+}
 
-    switch (mId)
-    {
+SchematicLayer::SchematicLayer(const XmlDomElement& domElement) throw (Exception) :
+    Layer(domElement)
+{
+}
+
+SchematicLayer::SchematicLayer(int id) noexcept :
+    Layer(id, "Unknown", Qt::black, Qt::black, Qt::SolidPattern, false)
+{
+    switch (mId) {
         case Grid:
             mName = tr("Grid");
             mColor = Qt::white;                 // background
@@ -68,10 +75,17 @@ SchematicLayer::SchematicLayer(int id) :
             mIsVisible = true;
             break;
 
-        case SymbolPinCircles:
-            mName = tr("Symbol Pin Circles");
-            mColor = Qt::green;             // optional pin
-            mColorHighlighted = Qt::red;    // required pin
+        case SymbolOptionalPinCircles:
+            mName = tr("Symbol Pin Circles (optional)");
+            mColor = QColor(0, 255, 0, 255);
+            mColorHighlighted = QColor(0, 255, 0, 127);
+            mIsVisible = true;
+            break;
+
+        case SymbolRequiredPinCircles:
+            mName = tr("Symbol Pin Circles (required)");
+            mColor = QColor(255, 0, 0, 255);
+            mColorHighlighted = QColor(255, 0, 0, 127);
             mIsVisible = true;
             break;
 
@@ -174,17 +188,8 @@ SchematicLayer::SchematicLayer(int id) :
     }
 }
 
-SchematicLayer::~SchematicLayer()
+SchematicLayer::~SchematicLayer() noexcept
 {
-}
-
-/*****************************************************************************************
- *  Getters
- ****************************************************************************************/
-
-const QColor& SchematicLayer::getColor(bool highlighted) const
-{
-    return highlighted ? mColorHighlighted : mColor;
 }
 
 /*****************************************************************************************

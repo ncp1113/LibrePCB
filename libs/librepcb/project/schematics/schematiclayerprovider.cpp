@@ -42,7 +42,8 @@ SchematicLayerProvider::SchematicLayerProvider(Project& project) throw (Exceptio
     addLayer(SchematicLayer::LayerID::OriginCrosses);
     addLayer(SchematicLayer::LayerID::SymbolOutlines);
     addLayer(SchematicLayer::LayerID::SymbolGrabAreas);
-    addLayer(SchematicLayer::LayerID::SymbolPinCircles);
+    addLayer(SchematicLayer::LayerID::SymbolOptionalPinCircles);
+    addLayer(SchematicLayer::LayerID::SymbolRequiredPinCircles);
     addLayer(SchematicLayer::LayerID::SymbolPinNames);
     addLayer(SchematicLayer::LayerID::ComponentNames);
     addLayer(SchematicLayer::LayerID::ComponentValues);

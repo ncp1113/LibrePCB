@@ -132,10 +132,14 @@ void SGI_SymbolPin::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
     }
 
     // draw circle
-    layer = getSchematicLayer(SchematicLayer::SymbolPinCircles); Q_ASSERT(layer);
+    if (mPin.isRequired()) {
+        layer = getSchematicLayer(SchematicLayer::SymbolRequiredPinCircles);
+    } else {
+        layer = getSchematicLayer(SchematicLayer::SymbolOptionalPinCircles);
+    } Q_ASSERT(layer);
     if ((layer->isVisible()) && (!deviceIsPrinter) && (!netsignal))
     {
-        painter->setPen(QPen(layer->getColor(mPin.isRequired()), 0));
+        painter->setPen(QPen(layer->getColor(highlight), 0));
         painter->setBrush(Qt::NoBrush);
         painter->drawEllipse(QPointF(0, 0), mRadiusPx, mRadiusPx);
     }
