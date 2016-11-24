@@ -17,98 +17,77 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORWIDGET_H
+#ifndef LIBREPCB_LIBRARY_SYMBOLGRAPHICSITEM_H
+#define LIBREPCB_LIBRARY_SYMBOLGRAPHICSITEM_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
-#include "../common/editorwidgetbase.h"
-#include "../common/categorylisteditorwidget.h"
+#include <librepcb/common/uuid.h>
+#include <librepcb/common/units/all_length_units.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class GridProperties;
-class GraphicsScene;
+class IF_SchematicLayerProvider;
 
 namespace library {
 
 class Symbol;
-class SymbolGraphicsItem;
-
-namespace editor {
-
-class SymbolEditorFsm;
-
-namespace Ui {
-class SymbolEditorWidget;
-}
+class SymbolPinGraphicsItem;
 
 /*****************************************************************************************
- *  Class SymbolEditorWidget
+ *  Class SymbolGraphicsItem
  ****************************************************************************************/
 
 /**
- * @brief The SymbolEditorWidget class
+ * @brief The SymbolGraphicsItem class
  *
  * @author ubruhin
- * @date 2016-10-16
+ * @date 2016-11-06
  */
-class SymbolEditorWidget final : public EditorWidgetBase, public IF_GraphicsViewEventHandler
+class SymbolGraphicsItem final : public QGraphicsItem
 {
-        Q_OBJECT
-
     public:
 
         // Constructors / Destructor
-        SymbolEditorWidget() = delete;
-        SymbolEditorWidget(const SymbolEditorWidget& other) = delete;
-        SymbolEditorWidget(workspace::Workspace& ws, LibraryEditor& editor,
-                           const FilePath& fp, QWidget* parent = nullptr) throw (Exception);
-        ~SymbolEditorWidget() noexcept;
+        SymbolGraphicsItem() = delete;
+        SymbolGraphicsItem(const SymbolGraphicsItem& other) = delete;
+        SymbolGraphicsItem(const Symbol& symbol,
+                           const IF_SchematicLayerProvider& layerProvider) noexcept;
+        ~SymbolGraphicsItem() noexcept;
+
+        // Setters
+        void setPosition(const Point& pos) noexcept;
+        void setRotation(const Angle& rot) noexcept;
+
+        // General Methods
+        void setSelectionRect(const QRectF rect) noexcept;
+
+        // Inherited from QGraphicsItem
+        QRectF boundingRect() const noexcept override {return QRectF();}
+        QPainterPath shape() const noexcept override {return QPainterPath();}
+        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) noexcept override;
 
         // Operator Overloadings
-        SymbolEditorWidget& operator=(const SymbolEditorWidget& rhs) = delete;
-
-
-    public slots:
-
-        bool save() noexcept override;
-
-
-    private: // Methods
-
-        /**
-         * @copydoc librepcb::IF_GraphicsViewEventHandler::graphicsViewEventHandler()
-         */
-        bool graphicsViewEventHandler(QEvent* event) noexcept override;
+        SymbolGraphicsItem& operator=(const SymbolGraphicsItem& rhs) = delete;
 
 
     private: // Data
-
-        QScopedPointer<Ui::SymbolEditorWidget> mUi;
-        QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
-        QScopedPointer<GridProperties> mGridProperties;
-        QScopedPointer<GraphicsScene> mGraphicsScene;
-        QSharedPointer<Symbol> mSymbol;
-        QScopedPointer<SymbolGraphicsItem> mGraphicsItem;
-        QSharedPointer<SymbolEditorFsm> mFsm;
+        const Symbol& mSymbol;
+        const IF_SchematicLayerProvider& mLayerProvider;
+        QHash<Uuid, QSharedPointer<SymbolPinGraphicsItem>> mPinGraphicsItems;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
 } // namespace library
 } // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORWIDGET_H
+#endif // LIBREPCB_LIBRARY_SYMBOLGRAPHICSITEM_H

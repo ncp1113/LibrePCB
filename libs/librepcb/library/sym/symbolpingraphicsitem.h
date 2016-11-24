@@ -17,98 +17,82 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORWIDGET_H
-#define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORWIDGET_H
+#ifndef LIBREPCB_LIBRARY_SYMBOLPINGRAPHICSITEM_H
+#define LIBREPCB_LIBRARY_SYMBOLPINGRAPHICSITEM_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/common/exceptions.h>
-#include <librepcb/common/fileio/filepath.h>
-#include <librepcb/common/graphics/if_graphicsvieweventhandler.h>
-#include "../common/editorwidgetbase.h"
-#include "../common/categorylisteditorwidget.h"
+#include <librepcb/common/units/all_length_units.h>
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 
-class GridProperties;
-class GraphicsScene;
+class IF_SchematicLayerProvider;
+class EllipseGraphicsItem;
+class LineGraphicsItem;
+class TextGraphicsItem;
 
 namespace library {
 
-class Symbol;
-class SymbolGraphicsItem;
-
-namespace editor {
-
-class SymbolEditorFsm;
-
-namespace Ui {
-class SymbolEditorWidget;
-}
+class SymbolPin;
 
 /*****************************************************************************************
- *  Class SymbolEditorWidget
+ *  Class SymbolPinGraphicsItem
  ****************************************************************************************/
 
 /**
- * @brief The SymbolEditorWidget class
+ * @brief The SymbolPinGraphicsItem class
  *
  * @author ubruhin
- * @date 2016-10-16
+ * @date 2016-11-05
  */
-class SymbolEditorWidget final : public EditorWidgetBase, public IF_GraphicsViewEventHandler
+class SymbolPinGraphicsItem final : public QGraphicsItemGroup
 {
-        Q_OBJECT
-
     public:
 
         // Constructors / Destructor
-        SymbolEditorWidget() = delete;
-        SymbolEditorWidget(const SymbolEditorWidget& other) = delete;
-        SymbolEditorWidget(workspace::Workspace& ws, LibraryEditor& editor,
-                           const FilePath& fp, QWidget* parent = nullptr) throw (Exception);
-        ~SymbolEditorWidget() noexcept;
+        SymbolPinGraphicsItem() = delete;
+        SymbolPinGraphicsItem(const SymbolPinGraphicsItem& other) = delete;
+        SymbolPinGraphicsItem(const SymbolPin& pin,
+                              const IF_SchematicLayerProvider& layerProvider,
+                              QGraphicsItem* parent = nullptr) noexcept;
+        ~SymbolPinGraphicsItem() noexcept;
+
+        // Setters
+        void setPosition(const Point& pos) noexcept;
+        void setRotation(const Angle& rot) noexcept;
+        void setLength(const Length& length) noexcept;
+        void setName(const QString& name) noexcept;
+
+        // Inherited from QGraphicsItem
+        QVariant itemChange(GraphicsItemChange change, const QVariant &value) noexcept override;
+        QPainterPath shape() const noexcept override;
 
         // Operator Overloadings
-        SymbolEditorWidget& operator=(const SymbolEditorWidget& rhs) = delete;
-
-
-    public slots:
-
-        bool save() noexcept override;
+        SymbolPinGraphicsItem& operator=(const SymbolPinGraphicsItem& rhs) = delete;
 
 
     private: // Methods
-
-        /**
-         * @copydoc librepcb::IF_GraphicsViewEventHandler::graphicsViewEventHandler()
-         */
-        bool graphicsViewEventHandler(QEvent* event) noexcept override;
+        void updateShape() noexcept;
 
 
     private: // Data
-
-        QScopedPointer<Ui::SymbolEditorWidget> mUi;
-        QScopedPointer<ComponentCategoryListEditorWidget> mCategoriesEditorWidget;
-        QScopedPointer<GridProperties> mGridProperties;
-        QScopedPointer<GraphicsScene> mGraphicsScene;
-        QSharedPointer<Symbol> mSymbol;
-        QScopedPointer<SymbolGraphicsItem> mGraphicsItem;
-        QSharedPointer<SymbolEditorFsm> mFsm;
+        const SymbolPin& mPin;
+        QScopedPointer<EllipseGraphicsItem> mCircleGraphicsItem;
+        QScopedPointer<LineGraphicsItem> mLineGraphicsItem;
+        QScopedPointer<TextGraphicsItem> mTextGraphicsItem;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
 } // namespace library
 } // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORWIDGET_H
+#endif // LIBREPCB_LIBRARY_SYMBOLPINGRAPHICSITEM_H
