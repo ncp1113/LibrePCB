@@ -21,11 +21,10 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdmoveselectedsymbolitems.h"
-#include <librepcb/common/gridproperties.h>
+#include "cmdremoveselectedsymbolitems.h"
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 #include <librepcb/library/sym/symbolpingraphicsitem.h>
-#include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
+#include <librepcb/library/sym/cmd/cmdsymbolpinremove.h>
 
 /*****************************************************************************************
  *  Namespace
@@ -38,68 +37,36 @@ namespace editor {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdMoveSelectedSymbolItems::CmdMoveSelectedSymbolItems(const SymbolEditorState::Context& context,
-                                                       const Point& startPos) noexcept :
-    UndoCommandGroup(tr("Move Symbol Elements")),
-    mContext(context), mStartPos(startPos), mDeltaPos(0, 0)
+CmdRemoveSelectedSymbolItems::CmdRemoveSelectedSymbolItems(const SymbolEditorState::Context& context) noexcept :
+    UndoCommandGroup(tr("Remove Symbol Elements")), mContext(context)
 {
-    QList<QSharedPointer<SymbolPinGraphicsItem>> pins = context.symbolGraphicsItem.getSelectedPins();
-    foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin, pins) {Q_ASSERT(pin);
-        mPinEditCmds.append(new CmdSymbolPinEdit(pin->getPin()));
-    }
 }
 
-CmdMoveSelectedSymbolItems::~CmdMoveSelectedSymbolItems() noexcept
+CmdRemoveSelectedSymbolItems::~CmdRemoveSelectedSymbolItems() noexcept
 {
-    deleteAllCommands();
-}
-
-/*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-void CmdMoveSelectedSymbolItems::setCurrentPosition(const Point& pos) noexcept
-{
-    Point delta = pos - mStartPos;
-    delta.mapToGrid(mContext.gridProperties.getInterval());
-
-    if (delta != mDeltaPos) {
-        // move selected elements
-        foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) {
-            cmd->setDeltaToStartPos(delta, true);
-        }
-        mDeltaPos = delta;
-    }
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdMoveSelectedSymbolItems::performExecute() throw (Exception)
+bool CmdRemoveSelectedSymbolItems::performExecute() throw (Exception)
 {
-    if (mDeltaPos.isOrigin()) {
-        // no movement required --> discard all move commands
-        deleteAllCommands();
+    // get all selected items
+    QList<QSharedPointer<SymbolPinGraphicsItem>> pins = mContext.symbolGraphicsItem.getSelectedPins();
+
+    // no items selected --> nothing to do here
+    if (pins.isEmpty()) {
         return false;
     }
 
-    // move all child commands to parent class
-    while (mPinEditCmds.count() > 0) {
-        appendChild(mPinEditCmds.takeLast());
+    // remove all selected elements
+    foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin, pins) {Q_ASSERT(pin);
+        appendChild(new CmdSymbolPinRemove(mContext.symbol, pin->getPin()));
     }
 
     // execute all child commands
     return UndoCommandGroup::performExecute(); // can throw
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-void CmdMoveSelectedSymbolItems::deleteAllCommands() noexcept
-{
-    qDeleteAll(mPinEditCmds);           mPinEditCmds.clear();
 }
 
 /*****************************************************************************************

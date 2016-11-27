@@ -37,7 +37,10 @@ SOURCES += \
     sym/fsm/symboleditorstate.cpp \
     sym/fsm/symboleditorfsm.cpp \
     sym/fsm/symboleditorstate_select.cpp \
-    sym/fsm/cmd/cmdmoveselectedsymbolitems.cpp
+    sym/fsm/cmd/cmdmoveselectedsymbolitems.cpp \
+    sym/fsm/cmd/cmdrotateselectedsymbolitems.cpp \
+    sym/fsm/cmd/cmdremoveselectedsymbolitems.cpp \
+    sym/fsm/symboleditorstate_addpins.cpp
 
 HEADERS += \
     libraryeditor.h \
@@ -56,7 +59,10 @@ HEADERS += \
     sym/fsm/symboleditorstate.h \
     sym/fsm/symboleditorfsm.h \
     sym/fsm/symboleditorstate_select.h \
-    sym/fsm/cmd/cmdmoveselectedsymbolitems.h
+    sym/fsm/cmd/cmdmoveselectedsymbolitems.h \
+    sym/fsm/cmd/cmdrotateselectedsymbolitems.h \
+    sym/fsm/cmd/cmdremoveselectedsymbolitems.h \
+    sym/fsm/symboleditorstate_addpins.h
 
 FORMS += \
     libraryeditor.ui \

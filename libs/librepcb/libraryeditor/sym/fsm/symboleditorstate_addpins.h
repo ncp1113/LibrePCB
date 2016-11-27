@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_SELECT_H
-#define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_SELECT_H
+#ifndef LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_ADDPINS_H
+#define LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_ADDPINS_H
 
 /*****************************************************************************************
  *  Includes
@@ -32,31 +32,37 @@
  ****************************************************************************************/
 namespace librepcb {
 namespace library {
+
+class SymbolPin;
+class CmdSymbolPinEdit;
+
 namespace editor {
 
-class CmdMoveSelectedSymbolItems;
-
 /*****************************************************************************************
- *  Class SymbolEditorState_Select
+ *  Class SymbolEditorState_AddPins
  ****************************************************************************************/
 
 /**
- * @brief The SymbolEditorState_Select class
+ * @brief The SymbolEditorState_AddPins class
  *
  * @author  ubruhin
- * @date    2016-11-02
+ * @date    2016-11-27
  */
-class SymbolEditorState_Select final : public SymbolEditorState
+class SymbolEditorState_AddPins final : public SymbolEditorState
 {
         Q_OBJECT
 
     public:
 
         // Constructors / Destructor
-        SymbolEditorState_Select() = delete;
-        SymbolEditorState_Select(const SymbolEditorState_Select& other) = delete;
-        explicit SymbolEditorState_Select(const Context& context) noexcept;
-        ~SymbolEditorState_Select() noexcept;
+        SymbolEditorState_AddPins() = delete;
+        SymbolEditorState_AddPins(const SymbolEditorState_AddPins& other) = delete;
+        explicit SymbolEditorState_AddPins(const Context& context) noexcept;
+        ~SymbolEditorState_AddPins() noexcept;
+
+        // General Methods
+        bool entry() noexcept override;
+        bool exit() noexcept override;
 
         // Event Handlers
         bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept override;
@@ -70,20 +76,16 @@ class SymbolEditorState_Select final : public SymbolEditorState
         bool processStartAddingSymbolPins() noexcept override;
 
         // Operator Overloadings
-        SymbolEditorState_Select& operator=(const SymbolEditorState_Select& rhs) = delete;
+        SymbolEditorState_AddPins& operator=(const SymbolEditorState_AddPins& rhs) = delete;
 
 
     private: // Methods
-        bool rotateSelectedItems(const Angle& angle) noexcept;
-        bool removeSelectedItems() noexcept;
-        void setSelectionRect(const Point& p1, const Point& p2) noexcept;
-        void clearSelectionRect(bool updateItemsSelectionState) noexcept;
+
 
 
     private: // Types / Data
-        enum class SubState {IDLE, SELECTING, MOVING};
-        SubState mState;
-        QScopedPointer<CmdMoveSelectedSymbolItems> mCmdMoveSelectedItems;
+        QScopedPointer<CmdSymbolPinEdit> mEditCmd;
+        SymbolPin* mCurrentPin;
 };
 
 /*****************************************************************************************
@@ -94,4 +96,4 @@ class SymbolEditorState_Select final : public SymbolEditorState
 } // namespace library
 } // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_SELECT_H
+#endif // LIBREPCB_LIBRARY_EDITOR_SYMBOLEDITORSTATE_ADDPINS_H

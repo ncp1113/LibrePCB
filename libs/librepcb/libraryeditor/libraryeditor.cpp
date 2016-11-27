@@ -230,9 +230,11 @@ void LibraryEditor::currentTabChanged(int index) noexcept
 
     EditorWidgetBase* widget = dynamic_cast<EditorWidgetBase*>(mUi->tabWidget->widget(index));
     if (widget) {
+        // connect file actions
         mCurrentTabActionConnections.append(
                     connect(mUi->actionSave, &QAction::triggered,
                             widget, &EditorWidgetBase::save));
+        // connect undo/redo actions
         mCurrentTabActionConnections.append(
                     connect(mUi->actionUndo, &QAction::triggered,
                             widget, &EditorWidgetBase::undo));
@@ -255,6 +257,27 @@ void LibraryEditor::currentTabChanged(int index) noexcept
         mUi->actionRedo->setText(widget->getRedoText());
         mUi->actionUndo->setEnabled(widget->canUndo());
         mUi->actionRedo->setEnabled(widget->canRedo());
+        // connect edit actions
+        mCurrentTabActionConnections.append(
+                    connect(mUi->actionRotateCw, &QAction::triggered,
+                            widget, &EditorWidgetBase::rotateCw));
+        mCurrentTabActionConnections.append(
+                    connect(mUi->actionRotateCcw, &QAction::triggered,
+                            widget, &EditorWidgetBase::rotateCcw));
+        mCurrentTabActionConnections.append(
+                    connect(mUi->actionRemove, &QAction::triggered,
+                            widget, &EditorWidgetBase::remove));
+        // connect command actions
+        mCurrentTabActionConnections.append(
+                    connect(mUi->actionAbortCommand, &QAction::triggered,
+                            widget, &EditorWidgetBase::abortCommand));
+        // connect tools actions
+        mCurrentTabActionConnections.append(
+                    connect(mUi->actionToolSelect, &QAction::triggered,
+                            widget, &EditorWidgetBase::startSelecting));
+        mCurrentTabActionConnections.append(
+                    connect(mUi->actionAddSymbolPin, &QAction::triggered,
+                            widget, &EditorWidgetBase::startAddingSymbolPins));
     }
 }
 

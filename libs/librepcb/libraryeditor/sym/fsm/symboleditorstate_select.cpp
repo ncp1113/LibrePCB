@@ -23,7 +23,13 @@
 #include <QtCore>
 #include "symboleditorstate_select.h"
 #include <librepcb/common/graphics/graphicsscene.h>
+#include <librepcb/common/undostack.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
+#include <librepcb/library/sym/symbolpingraphicsitem.h>
+#include "cmd/cmdmoveselectedsymbolitems.h"
+#include "cmd/cmdrotateselectedsymbolitems.h"
+#include "cmd/cmdremoveselectedsymbolitems.h"
+#include "../symboleditorwidget.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -43,6 +49,7 @@ SymbolEditorState_Select::SymbolEditorState_Select(const Context& context) noexc
 
 SymbolEditorState_Select::~SymbolEditorState_Select() noexcept
 {
+    Q_ASSERT(mCmdMoveSelectedItems.isNull());
 }
 
 /*****************************************************************************************
@@ -51,12 +58,19 @@ SymbolEditorState_Select::~SymbolEditorState_Select() noexcept
 
 bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept
 {
+    Point startPos = Point::fromPx(e.buttonDownScenePos(Qt::LeftButton));
+    Point currentPos = Point::fromPx(e.scenePos());
+
     switch (mState) {
         case SubState::SELECTING: {
-            Point startPos = Point::fromPx(e.buttonDownScenePos(Qt::LeftButton));
-            Point currentPos = Point::fromPx(e.scenePos());
             setSelectionRect(startPos, currentPos);
             return true;
+        }
+        case SubState::MOVING: {
+            if (!mCmdMoveSelectedItems) {
+                mCmdMoveSelectedItems.reset(new CmdMoveSelectedSymbolItems(mContext, startPos));
+            }
+            mCmdMoveSelectedItems->setCurrentPosition(currentPos);
         }
         default: {
             return false;
@@ -66,17 +80,29 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(QGraphicsSceneMous
 
 bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept
 {
+    Point pos = Point::fromPx(e.scenePos());
+
     switch (mState) {
         case SubState::IDLE: {
-            clearSelectionRect(true);
-            Point pos = Point::fromPx(e.scenePos());
-            QGraphicsItem* item = mContext.graphicsScene.itemAt(pos.toPxQPointF(), QTransform());
-            if (item && (item != &mContext.symbolGraphicsItem)) {
-                // select + move one single item
-                item->setSelected(true);
-            } else {
-                // start selection mode
+            // get items under cursor
+            QList<QSharedPointer<SymbolPinGraphicsItem>> pins;
+            int count = mContext.symbolGraphicsItem.getItemsAtPosition(pos, pins);
+            if (count == 0) {
+                // start selecting
+                clearSelectionRect(true);
                 mState = SubState::SELECTING;
+            } else {
+                // check if the top most item under the cursor is already selected
+                bool itemAlreadySelected = pins.first()->isSelected();
+                // remove whole selection if CTRL is not pressed
+                if ((!itemAlreadySelected) && (!e.modifiers().testFlag(Qt::ControlModifier))) {
+                    clearSelectionRect(true);
+                }
+                // select top most item under the cursor
+                pins.first()->setSelected(true);
+                // start moving
+                Q_ASSERT(!mCmdMoveSelectedItems);
+                mState = SubState::MOVING;
             }
             return true;
         }
@@ -94,22 +120,102 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(QGrap
             mState = SubState::IDLE;
             return true;
         }
+        case SubState::MOVING: {
+            if (mCmdMoveSelectedItems) {
+                try {
+                    mContext.undoStack.execCmd(mCmdMoveSelectedItems.take());
+                } catch (const Exception& e) {
+                    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getUserMsg());
+                }
+            }
+            mState = SubState::IDLE;
+            return true;
+        }
         default: {
             return false;
         }
     }
 }
 
+bool SymbolEditorState_Select::processRotateCw() noexcept
+{
+    switch (mState) {
+        case SubState::IDLE: {
+            return rotateSelectedItems(-Angle::deg90());
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
+bool SymbolEditorState_Select::processRotateCcw() noexcept
+{
+    switch (mState) {
+        case SubState::IDLE: {
+            return rotateSelectedItems(Angle::deg90());
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
+bool SymbolEditorState_Select::processRemove() noexcept
+{
+    switch (mState) {
+        case SubState::IDLE: {
+            return removeSelectedItems();
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
+bool SymbolEditorState_Select::processAbortCommand() noexcept
+{
+    return false;
+}
+
+bool SymbolEditorState_Select::processStartSelecting() noexcept
+{
+    return false;
+}
+
+bool SymbolEditorState_Select::processStartAddingSymbolPins() noexcept
+{
+    return false;
+}
+
 /*****************************************************************************************
  *  Private Methods
  ****************************************************************************************/
 
+bool SymbolEditorState_Select::rotateSelectedItems(const Angle& angle) noexcept
+{
+    try {
+        mContext.undoStack.execCmd(new CmdRotateSelectedSymbolItems(mContext, angle));
+    } catch (const Exception& e) {
+        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getUserMsg());
+    }
+    return true; // TODO: return false if no items were selected
+}
+
+bool SymbolEditorState_Select::removeSelectedItems() noexcept
+{
+    try {
+        mContext.undoStack.execCmd(new CmdRemoveSelectedSymbolItems(mContext));
+    } catch (const Exception& e) {
+        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getUserMsg());
+    }
+    return true; // TODO: return false if no items were selected
+}
+
 void SymbolEditorState_Select::setSelectionRect(const Point& p1, const Point& p2) noexcept
 {
     mContext.graphicsScene.setSelectionRect(p1, p2);
-    QPainterPath path;
-    path.addRect(QRectF(p1.toPxQPointF(), p2.toPxQPointF()));
-    mContext.graphicsScene.setSelectionArea(path);
+    mContext.symbolGraphicsItem.setSelectionRect(QRectF(p1.toPxQPointF(), p2.toPxQPointF()));
 }
 
 void SymbolEditorState_Select::clearSelectionRect(bool updateItemsSelectionState) noexcept

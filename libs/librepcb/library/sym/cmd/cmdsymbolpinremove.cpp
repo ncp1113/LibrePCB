@@ -21,33 +21,55 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "symboleditorstate.h"
+#include "cmdsymbolpinremove.h"
+#include "../symbol.h"
+#include "../symbolpin.h"
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
 namespace library {
-namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolEditorState::SymbolEditorState(const Context& context) noexcept :
-    QObject(nullptr), mContext(context)
+CmdSymbolPinRemove::CmdSymbolPinRemove(Symbol& symbol, SymbolPin& pin) noexcept :
+    UndoCommand(tr("Remove pin")), mSymbol(symbol), mPin(pin)
 {
 }
 
-SymbolEditorState::~SymbolEditorState() noexcept
+CmdSymbolPinRemove::~CmdSymbolPinRemove() noexcept
 {
+    if (isCurrentlyExecuted()) {
+        delete &mPin;
+    }
+}
+
+/*****************************************************************************************
+ *  Inherited from UndoCommand
+ ****************************************************************************************/
+
+bool CmdSymbolPinRemove::performExecute() throw (Exception)
+{
+    performRedo(); // can throw
+    return true;
+}
+
+void CmdSymbolPinRemove::performUndo() throw (Exception)
+{
+    mSymbol.addPin(mPin);
+}
+
+void CmdSymbolPinRemove::performRedo() throw (Exception)
+{
+    mSymbol.removePin(mPin);
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
 } // namespace library
 } // namespace librepcb
-

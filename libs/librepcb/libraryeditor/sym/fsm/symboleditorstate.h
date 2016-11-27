@@ -34,6 +34,7 @@ namespace librepcb {
 
 class UndoStack;
 class GraphicsScene;
+class GridProperties;
 
 namespace library {
 
@@ -54,8 +55,10 @@ class SymbolEditorWidget;
  * @author  ubruhin
  * @date    2016-11-01
  */
-class SymbolEditorState
+class SymbolEditorState : public QObject
 {
+        Q_OBJECT
+
     public:
 
         // Types
@@ -63,6 +66,7 @@ class SymbolEditorState
             SymbolEditorWidget& editorWidget;
             UndoStack& undoStack;
             GraphicsScene& graphicsScene;
+            GridProperties& gridProperties;
             Symbol& symbol;
             SymbolGraphicsItem& symbolGraphicsItem;
         };
@@ -81,6 +85,12 @@ class SymbolEditorState
         virtual bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept = 0;
         virtual bool processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept = 0;
         virtual bool processGraphicsSceneLeftMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept = 0;
+        virtual bool processRotateCw() noexcept = 0;
+        virtual bool processRotateCcw() noexcept = 0;
+        virtual bool processRemove() noexcept = 0;
+        virtual bool processAbortCommand() noexcept = 0;
+        virtual bool processStartSelecting() noexcept = 0;
+        virtual bool processStartAddingSymbolPins() noexcept = 0;
 
         // Operator Overloadings
         SymbolEditorState& operator=(const SymbolEditorState& rhs) = delete;

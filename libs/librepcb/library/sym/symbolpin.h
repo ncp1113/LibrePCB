@@ -34,6 +34,8 @@
 namespace librepcb {
 namespace library {
 
+class SymbolPinGraphicsItem;
+
 /*****************************************************************************************
  *  Class SymbolPin
  ****************************************************************************************/
@@ -73,6 +75,8 @@ class SymbolPin final : public IF_XmlSerializableObject
         void setName(const QString& name) noexcept;
 
         // General Methods
+        void registerGraphicsItem(SymbolPinGraphicsItem& item) noexcept;
+        void unregisterGraphicsItem(SymbolPinGraphicsItem& item) noexcept;
 
         /// @copydoc IF_XmlSerializableObject#serializeToXmlDomElement()
         XmlDomElement* serializeToXmlDomElement() const throw (Exception) override;
@@ -93,6 +97,8 @@ class SymbolPin final : public IF_XmlSerializableObject
         Point mPosition;
         Length mLength;
         Angle mRotation;
+
+        SymbolPinGraphicsItem* mRegisteredGraphicsItem;
 };
 
 /*****************************************************************************************

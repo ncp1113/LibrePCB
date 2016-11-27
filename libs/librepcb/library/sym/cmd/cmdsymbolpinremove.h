@@ -17,37 +17,72 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_LIBRARY_CMDSYMBOLPINREMOVE_H
+#define LIBREPCB_LIBRARY_CMDSYMBOLPINREMOVE_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "symboleditorstate.h"
+#include <librepcb/common/undocommand.h>
+#include <librepcb/common/units/all_length_units.h>
 
 /*****************************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 namespace library {
-namespace editor {
+
+class Symbol;
+class SymbolPin;
 
 /*****************************************************************************************
- *  Constructors / Destructor
+ *  Class CmdSymbolPinRemove
  ****************************************************************************************/
 
-SymbolEditorState::SymbolEditorState(const Context& context) noexcept :
-    QObject(nullptr), mContext(context)
+/**
+ * @brief The CmdSymbolPinRemove class
+ */
+class CmdSymbolPinRemove final : public UndoCommand
 {
-}
+    public:
 
-SymbolEditorState::~SymbolEditorState() noexcept
-{
-}
+        // Constructors / Destructor
+        CmdSymbolPinRemove() = delete;
+        CmdSymbolPinRemove(const CmdSymbolPinRemove& other) = delete;
+        CmdSymbolPinRemove(Symbol& symbol, SymbolPin& pin) noexcept;
+        ~CmdSymbolPinRemove() noexcept;
+
+        // Operator Overloadings
+        CmdSymbolPinRemove& operator=(const CmdSymbolPinRemove& rhs) = delete;
+
+
+    private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        bool performExecute() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() throw (Exception) override;
+
+
+        // Private Member Variables
+
+        // Attributes from the constructor
+        Symbol& mSymbol;
+        SymbolPin& mPin;
+};
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
 } // namespace library
 } // namespace librepcb
 
+#endif // LIBREPCB_LIBRARY_CMDSYMBOLPINREMOVE_H

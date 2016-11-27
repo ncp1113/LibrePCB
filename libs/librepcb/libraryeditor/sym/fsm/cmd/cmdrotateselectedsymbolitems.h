@@ -17,31 +17,61 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDSYMBOLITEMS_H
+#define LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDSYMBOLITEMS_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "symboleditorstate.h"
+#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/units/angle.h>
+#include "../symboleditorstate.h"
 
 /*****************************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
 /*****************************************************************************************
- *  Constructors / Destructor
+ *  Class CmdRotateSelectedSymbolItems
  ****************************************************************************************/
 
-SymbolEditorState::SymbolEditorState(const Context& context) noexcept :
-    QObject(nullptr), mContext(context)
+/**
+ * @brief The CmdRotateSelectedSymbolItems class
+ *
+ * @author  ubruhin
+ * @date    2016-11-05
+ */
+class CmdRotateSelectedSymbolItems final : public UndoCommandGroup
 {
-}
+    public:
 
-SymbolEditorState::~SymbolEditorState() noexcept
-{
-}
+        // Constructors / Destructor
+        CmdRotateSelectedSymbolItems() = delete;
+        CmdRotateSelectedSymbolItems(const CmdRotateSelectedSymbolItems& other) = delete;
+        CmdRotateSelectedSymbolItems(const SymbolEditorState::Context& context,
+                                     const Angle& angle) noexcept;
+        ~CmdRotateSelectedSymbolItems() noexcept;
+
+        // Operator Overloadings
+        CmdRotateSelectedSymbolItems& operator=(const CmdRotateSelectedSymbolItems& rhs) = delete;
+
+
+    private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        bool performExecute() throw (Exception) override;
+
+
+        // Private Member Variables
+        const SymbolEditorState::Context& mContext;
+        Angle mAngle;
+};
 
 /*****************************************************************************************
  *  End of File
@@ -51,3 +81,4 @@ SymbolEditorState::~SymbolEditorState() noexcept
 } // namespace library
 } // namespace librepcb
 
+#endif // LIBREPCB_LIBRARY_EDITOR_CMDROTATESELECTEDSYMBOLITEMS_H

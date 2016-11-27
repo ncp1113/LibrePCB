@@ -45,6 +45,12 @@ namespace editor {
  */
 class SymbolEditorFsm final : public SymbolEditorState
 {
+        Q_OBJECT
+
+    private: // Types
+        enum class State {IDLE, SELECT, ADD_PINS};
+
+
     public:
 
         // Constructors / Destructor
@@ -57,12 +63,27 @@ class SymbolEditorFsm final : public SymbolEditorState
         bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept override;
         bool processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept override;
         bool processGraphicsSceneLeftMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept override;
+        bool processRotateCw() noexcept override;
+        bool processRotateCcw() noexcept override;
+        bool processRemove() noexcept override;
+        bool processAbortCommand() noexcept override;
+        bool processStartSelecting() noexcept override;
+        bool processStartAddingSymbolPins() noexcept override;
 
         // Operator Overloadings
         SymbolEditorState& operator=(const SymbolEditorState& rhs) = delete;
 
+
+    private: // Methods
+        SymbolEditorState* getCurrentState() const noexcept;
+        bool setNextState(State state) noexcept;
+        bool leaveCurrentState() noexcept;
+        bool enterNextState(State state) noexcept;
+
+
     private: // Data
-        SymbolEditorState* mCurrentState;
+        QMap<State, SymbolEditorState*> mStates;
+        State mCurrentState;
 };
 
 /*****************************************************************************************

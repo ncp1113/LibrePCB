@@ -38,6 +38,7 @@ class IF_SchematicLayerProvider;
 namespace library {
 
 class Symbol;
+class SymbolPin;
 class SymbolPinGraphicsItem;
 
 /*****************************************************************************************
@@ -57,15 +58,23 @@ class SymbolGraphicsItem final : public QGraphicsItem
         // Constructors / Destructor
         SymbolGraphicsItem() = delete;
         SymbolGraphicsItem(const SymbolGraphicsItem& other) = delete;
-        SymbolGraphicsItem(const Symbol& symbol,
+        SymbolGraphicsItem(Symbol& symbol,
                            const IF_SchematicLayerProvider& layerProvider) noexcept;
         ~SymbolGraphicsItem() noexcept;
+
+        // Getters
+        SymbolPinGraphicsItem* getPinGraphicsItem(const Uuid& pin) noexcept;
+        int getItemsAtPosition(const Point& pos,
+                               QList<QSharedPointer<SymbolPinGraphicsItem>>& pins) noexcept;
+        QList<QSharedPointer<SymbolPinGraphicsItem>> getSelectedPins() noexcept;
 
         // Setters
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rot) noexcept;
 
         // General Methods
+        void addPin(SymbolPin& pin) noexcept;
+        void removePin(SymbolPin& pin) noexcept;
         void setSelectionRect(const QRectF rect) noexcept;
 
         // Inherited from QGraphicsItem
@@ -78,7 +87,7 @@ class SymbolGraphicsItem final : public QGraphicsItem
 
 
     private: // Data
-        const Symbol& mSymbol;
+        Symbol& mSymbol;
         const IF_SchematicLayerProvider& mLayerProvider;
         QHash<Uuid, QSharedPointer<SymbolPinGraphicsItem>> mPinGraphicsItems;
 };

@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDSYMBOLITEMS_H
-#define LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDSYMBOLITEMS_H
+#ifndef LIBREPCB_LIBRARY_CMDSYMBOLPINEDIT_H
+#define LIBREPCB_LIBRARY_CMDSYMBOLPINEDIT_H
 
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/undocommand.h>
 #include <librepcb/common/units/all_length_units.h>
-#include "../symboleditorstate.h"
 
 /*****************************************************************************************
  *  Namespace / Forward Declarations
@@ -34,36 +33,33 @@
 namespace librepcb {
 namespace library {
 
-class CmdSymbolPinEdit;
-
-namespace editor {
+class SymbolPin;
 
 /*****************************************************************************************
- *  Class CmdMoveSelectedSymbolItems
+ *  Class CmdSymbolPinEdit
  ****************************************************************************************/
 
 /**
- * @brief The CmdMoveSelectedSymbolItems class
- *
- * @author  ubruhin
- * @date    2016-11-05
+ * @brief The CmdSymbolPinEdit class
  */
-class CmdMoveSelectedSymbolItems final : public UndoCommandGroup
+class CmdSymbolPinEdit final : public UndoCommand
 {
     public:
 
         // Constructors / Destructor
-        CmdMoveSelectedSymbolItems() = delete;
-        CmdMoveSelectedSymbolItems(const CmdMoveSelectedSymbolItems& other) = delete;
-        CmdMoveSelectedSymbolItems(const SymbolEditorState::Context& context,
-                                   const Point& startPos) noexcept;
-        ~CmdMoveSelectedSymbolItems() noexcept;
+        CmdSymbolPinEdit() = delete;
+        CmdSymbolPinEdit(const CmdSymbolPinEdit& other) = delete;
+        explicit CmdSymbolPinEdit(SymbolPin& pin) noexcept;
+        ~CmdSymbolPinEdit() noexcept;
 
-        // General Methods
-        void setCurrentPosition(const Point& pos) noexcept;
+        // Setters
+        void setPosition(const Point& pos, bool immediate) noexcept;
+        void setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept;
+        void setRotation(const Angle& angle, bool immediate) noexcept;
+        void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
         // Operator Overloadings
-        CmdMoveSelectedSymbolItems& operator=(const CmdMoveSelectedSymbolItems& rhs) = delete;
+        CmdSymbolPinEdit& operator=(const CmdSymbolPinEdit& rhs) = delete;
 
 
     private:
@@ -73,24 +69,30 @@ class CmdMoveSelectedSymbolItems final : public UndoCommandGroup
         /// @copydoc UndoCommand::performExecute()
         bool performExecute() throw (Exception) override;
 
-        void deleteAllCommands() noexcept;
+        /// @copydoc UndoCommand::performUndo()
+        void performUndo() throw (Exception) override;
+
+        /// @copydoc UndoCommand::performRedo()
+        void performRedo() throw (Exception) override;
 
 
         // Private Member Variables
-        const SymbolEditorState::Context& mContext;
-        Point mStartPos;
-        Point mDeltaPos;
 
-        // Move commands
-        QList<CmdSymbolPinEdit*> mPinEditCmds;
+        // Attributes from the constructor
+        SymbolPin& mPin;
+
+        // General Attributes
+        Point mOldPos;
+        Point mNewPos;
+        Angle mOldRotation;
+        Angle mNewRotation;
 };
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
 } // namespace library
 } // namespace librepcb
 
-#endif // LIBREPCB_LIBRARY_EDITOR_CMDMOVESELECTEDSYMBOLITEMS_H
+#endif // LIBREPCB_LIBRARY_CMDSYMBOLPINEDIT_H

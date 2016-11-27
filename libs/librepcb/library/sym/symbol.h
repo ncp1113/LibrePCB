@@ -36,6 +36,8 @@
 namespace librepcb {
 namespace library {
 
+class SymbolGraphicsItem;
+
 /*****************************************************************************************
  *  Class Symbol
  ****************************************************************************************/
@@ -66,6 +68,7 @@ class Symbol final : public LibraryElement
 
         // SymbolPin Methods
         const QMap<Uuid, SymbolPin*>& getPins() noexcept {return mPins;}
+        //QList<SymbolPin*> getPinsInRect(const Point& p1, const Point& p2) noexcept;
         QList<Uuid> getPinUuids() const noexcept {return mPins.keys();}
         SymbolPin* getPinByUuid(const Uuid& uuid) noexcept {return mPins.value(uuid);}
         const SymbolPin* getPinByUuid(const Uuid& uuid) const noexcept {return mPins.value(uuid);}
@@ -96,6 +99,10 @@ class Symbol final : public LibraryElement
         void addText(Text& text) noexcept;
         void removeText(Text& text) noexcept;
 
+        // General Methods
+        void registerGraphicsItem(SymbolGraphicsItem& item) noexcept;
+        void unregisterGraphicsItem(SymbolGraphicsItem& item) noexcept;
+
         // Operator Overloadings
         Symbol& operator=(const Symbol& rhs) = delete;
 
@@ -115,6 +122,8 @@ class Symbol final : public LibraryElement
         QList<Polygon*> mPolygons;
         QList<Ellipse*> mEllipses;
         QList<Text*> mTexts;
+
+        SymbolGraphicsItem* mRegisteredGraphicsItem;
 };
 
 /*****************************************************************************************

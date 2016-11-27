@@ -23,6 +23,7 @@
 #include <QtCore>
 #include "symboleditorfsm.h"
 #include "symboleditorstate_select.h"
+#include "symboleditorstate_addpins.h"
 
 /*****************************************************************************************
  *  Namespace
@@ -36,13 +37,17 @@ namespace editor {
  ****************************************************************************************/
 
 SymbolEditorFsm::SymbolEditorFsm(const Context& context) noexcept :
-    SymbolEditorState(context)
+    SymbolEditorState(context), mCurrentState(State::IDLE)
 {
-    mCurrentState = new SymbolEditorState_Select(context);
+    mStates.insert(State::SELECT,   new SymbolEditorState_Select(context));
+    mStates.insert(State::ADD_PINS, new SymbolEditorState_AddPins(context));
+    enterNextState(State::SELECT);
 }
 
 SymbolEditorFsm::~SymbolEditorFsm() noexcept
 {
+    leaveCurrentState();
+    qDeleteAll(mStates);    mStates.clear();
 }
 
 /*****************************************************************************************
@@ -51,17 +56,123 @@ SymbolEditorFsm::~SymbolEditorFsm() noexcept
 
 bool SymbolEditorFsm::processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept
 {
-    return mCurrentState->processGraphicsSceneMouseMoved(e);
+    if (getCurrentState()) {
+        return getCurrentState()->processGraphicsSceneMouseMoved(e);
+    } else {
+        return false;
+    }
 }
 
 bool SymbolEditorFsm::processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept
 {
-    return mCurrentState->processGraphicsSceneLeftMouseButtonPressed(e);
+    if (getCurrentState()) {
+        return getCurrentState()->processGraphicsSceneLeftMouseButtonPressed(e);
+    } else {
+        return false;
+    }
 }
 
 bool SymbolEditorFsm::processGraphicsSceneLeftMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept
 {
-    return mCurrentState->processGraphicsSceneLeftMouseButtonReleased(e);
+    if (getCurrentState()) {
+        return getCurrentState()->processGraphicsSceneLeftMouseButtonReleased(e);
+    } else {
+        return false;
+    }
+}
+
+bool SymbolEditorFsm::processRotateCw() noexcept
+{
+    if (getCurrentState()) {
+        return getCurrentState()->processRotateCw();
+    } else {
+        return false;
+    }
+}
+
+bool SymbolEditorFsm::processRotateCcw() noexcept
+{
+    if (getCurrentState()) {
+        return getCurrentState()->processRotateCcw();
+    } else {
+        return false;
+    }
+}
+
+bool SymbolEditorFsm::processRemove() noexcept
+{
+    if (getCurrentState()) {
+        return getCurrentState()->processRemove();
+    } else {
+        return false;
+    }
+}
+
+bool SymbolEditorFsm::processAbortCommand() noexcept
+{
+    if (getCurrentState()) {
+        return getCurrentState()->processAbortCommand();
+    } else {
+        return false;
+    }
+}
+
+bool SymbolEditorFsm::processStartSelecting() noexcept
+{
+    if (getCurrentState() && getCurrentState()->processStartSelecting()) {
+        return true;
+    } else {
+        return setNextState(State::SELECT);;
+    }
+}
+
+bool SymbolEditorFsm::processStartAddingSymbolPins() noexcept
+{
+    if (getCurrentState() && getCurrentState()->processStartAddingSymbolPins()) {
+        return true;
+    } else {
+        return setNextState(State::ADD_PINS);;
+    }
+}
+
+/*****************************************************************************************
+ *  Private Methods
+ ****************************************************************************************/
+
+SymbolEditorState* SymbolEditorFsm::getCurrentState() const noexcept
+{
+    return mStates.value(mCurrentState, nullptr);
+}
+
+bool SymbolEditorFsm::setNextState(State state) noexcept
+{
+    if (state == mCurrentState) {
+        return true;
+    }
+    if (!leaveCurrentState()) {
+        return false;
+    }
+    return enterNextState(state);
+}
+
+bool SymbolEditorFsm::leaveCurrentState() noexcept
+{
+    if ((getCurrentState()) && (!getCurrentState()->exit())) {
+        return false;
+    }
+    mCurrentState = State::IDLE;
+    return true;
+}
+
+bool SymbolEditorFsm::enterNextState(State state) noexcept
+{
+    Q_ASSERT(mCurrentState == State::IDLE);
+    SymbolEditorState* nextState = mStates.value(state, nullptr);
+    if ((nextState) && (!nextState->entry())) {
+        return false;
+    }
+    mCurrentState = state;
+    return true;
 }
 
 /*****************************************************************************************

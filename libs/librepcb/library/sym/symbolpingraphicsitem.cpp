@@ -40,30 +40,27 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolPinGraphicsItem::SymbolPinGraphicsItem(const SymbolPin& pin,
+SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolPin& pin,
         const IF_SchematicLayerProvider& layerProvider, QGraphicsItem* parent) noexcept :
-    QGraphicsItemGroup(parent), mPin(pin),
-    mCircleGraphicsItem(new EllipseGraphicsItem()),
-    mLineGraphicsItem(new LineGraphicsItem()),
-    mTextGraphicsItem(new TextGraphicsItem())
+    QGraphicsItem(parent), mPin(pin),
+    mCircleGraphicsItem(new EllipseGraphicsItem(this)),
+    mLineGraphicsItem(new LineGraphicsItem(this)),
+    mTextGraphicsItem(new TextGraphicsItem(this))
 {
+    setFlag(QGraphicsItem::ItemHasNoContents, false);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
-    //setFlag(QGraphicsItem::ItemHasNoContents, false);
-    //setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
 
     // circle
     mCircleGraphicsItem->setRadius(Length(600000), Length(600000));
     mCircleGraphicsItem->setLineLayer(layerProvider.getSchematicLayer(
                                           SchematicLayer::SymbolOptionalPinCircles));
     mCircleGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    addToGroup(mCircleGraphicsItem.data());
 
     // line
     mLineGraphicsItem->setLineWidth(Length(158750));
     mLineGraphicsItem->setLayer(layerProvider.getSchematicLayer(
                                     SchematicLayer::SymbolOutlines));
     mLineGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    addToGroup(mLineGraphicsItem.data());
 
     // text
     mTextGraphicsItem->setHeight(Length::fromMm(qreal(2)));
@@ -71,17 +68,20 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(const SymbolPin& pin,
     mTextGraphicsItem->setLayer(layerProvider.getSchematicLayer(
                                     SchematicLayer::SymbolPinNames));
     mTextGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    addToGroup(mTextGraphicsItem.data());
 
     // pin properties
     setPosition(mPin.getPosition());
     setRotation(mPin.getRotation());
     setLength(mPin.getLength());
     setName(mPin.getName());
+
+    // register to the pin to get attribute updates
+    mPin.registerGraphicsItem(*this);
 }
 
 SymbolPinGraphicsItem::~SymbolPinGraphicsItem() noexcept
 {
+    mPin.unregisterGraphicsItem(*this);
 }
 
 /*****************************************************************************************
@@ -90,12 +90,12 @@ SymbolPinGraphicsItem::~SymbolPinGraphicsItem() noexcept
 
 void SymbolPinGraphicsItem::setPosition(const Point& pos) noexcept
 {
-    QGraphicsItemGroup::setPos(pos.toPxQPointF());
+    QGraphicsItem::setPos(pos.toPxQPointF());
 }
 
 void SymbolPinGraphicsItem::setRotation(const Angle& rot) noexcept
 {
-    QGraphicsItemGroup::setRotation(-rot.toDeg());
+    QGraphicsItem::setRotation(-rot.toDeg());
 }
 
 void SymbolPinGraphicsItem::setLength(const Length& length) noexcept
@@ -110,26 +110,28 @@ void SymbolPinGraphicsItem::setName(const QString& name) noexcept
     mTextGraphicsItem->setText(name);
 }
 
+void SymbolPinGraphicsItem::setSelected(bool selected) noexcept
+{
+    mCircleGraphicsItem->setSelected(selected);
+    mLineGraphicsItem->setSelected(selected);
+    mTextGraphicsItem->setSelected(selected);
+    QGraphicsItem::setSelected(selected);
+}
+
 /*****************************************************************************************
  *  Inherited from QGraphicsItem
  ****************************************************************************************/
 
-QVariant SymbolPinGraphicsItem::itemChange(GraphicsItemChange change, const QVariant &value) noexcept
-{
-    if (change == ItemSelectedChange) {
-        /*mCircleGraphicsItem->setSelected(value.toBool());
-        mLineGraphicsItem->setSelected(value.toBool());
-        mTextGraphicsItem->setSelected(value.toBool());*/
-    }
-    return QGraphicsItem::itemChange(change, value);
-}
-
 QPainterPath SymbolPinGraphicsItem::shape() const noexcept
 {
     return mCircleGraphicsItem->shape();
-    /*QPainterPath p;
-    p.addRect(-10, -10, 20, 20);
-    return p;*/
+}
+
+void SymbolPinGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) noexcept
+{
+    Q_UNUSED(painter);
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 }
 
 /*****************************************************************************************

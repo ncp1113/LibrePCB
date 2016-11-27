@@ -36,15 +36,13 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolGraphicsItem::SymbolGraphicsItem(const Symbol& symbol,
+SymbolGraphicsItem::SymbolGraphicsItem(Symbol& symbol,
                                        const IF_SchematicLayerProvider& layerProvider) noexcept :
     QGraphicsItem(nullptr), mSymbol(symbol), mLayerProvider(layerProvider)
 {
     foreach (const Uuid& uuid, mSymbol.getPinUuids()) {
-        const SymbolPin* pin = mSymbol.getPinByUuid(uuid); Q_ASSERT(pin);
-        QSharedPointer<SymbolPinGraphicsItem> item(
-                    new SymbolPinGraphicsItem(*pin, mLayerProvider, this));
-        mPinGraphicsItems.insert(pin->getUuid(), item);
+        SymbolPin* pin = mSymbol.getPinByUuid(uuid); Q_ASSERT(pin);
+        addPin(*pin);
     }
 
     /*for (int i = 0; i < mSymbol.getPolygonCount(); ++i) {
@@ -53,10 +51,46 @@ SymbolGraphicsItem::SymbolGraphicsItem(const Symbol& symbol,
                     new SymbolPinGraphicsItem(*pin, mLayerProvider, this));
         mPinGraphicsItems.insert(pin->getUuid(), item);
     }*/
+
+    // register to the symbol to get attribute updates
+    mSymbol.registerGraphicsItem(*this);
 }
 
 SymbolGraphicsItem::~SymbolGraphicsItem() noexcept
 {
+    mSymbol.unregisterGraphicsItem(*this);
+}
+
+/*****************************************************************************************
+ *  Getters
+ ****************************************************************************************/
+
+SymbolPinGraphicsItem* SymbolGraphicsItem::getPinGraphicsItem(const Uuid& pin) noexcept
+{
+    return mPinGraphicsItems.value(pin).data();
+}
+
+int SymbolGraphicsItem::getItemsAtPosition(const Point& pos,
+    QList<QSharedPointer<SymbolPinGraphicsItem>>& pins) noexcept
+{
+    foreach (const QSharedPointer<SymbolPinGraphicsItem>& item, mPinGraphicsItems) {
+        QPointF mappedPos = mapToItem(item.data(), pos.toPxQPointF());
+        if (item->shape().contains(mappedPos)) {
+            pins.append(item);
+        }
+    }
+    return pins.count();
+}
+
+QList<QSharedPointer<SymbolPinGraphicsItem>> SymbolGraphicsItem::getSelectedPins() noexcept
+{
+    QList<QSharedPointer<SymbolPinGraphicsItem>> pins;
+    foreach (const QSharedPointer<SymbolPinGraphicsItem>& item, mPinGraphicsItems) {
+        if (item->isSelected()) {
+            pins.append(item);
+        }
+    }
+    return pins;
 }
 
 /*****************************************************************************************
@@ -73,12 +107,28 @@ void SymbolGraphicsItem::setRotation(const Angle& rot) noexcept
     QGraphicsItem::setRotation(-rot.toDeg());
 }
 
+void SymbolGraphicsItem::addPin(SymbolPin& pin) noexcept
+{
+    Q_ASSERT(!mPinGraphicsItems.contains(pin.getUuid()));
+    QSharedPointer<SymbolPinGraphicsItem> item(
+                new SymbolPinGraphicsItem(pin, mLayerProvider, this));
+    mPinGraphicsItems.insert(pin.getUuid(), item);
+}
+
+void SymbolGraphicsItem::removePin(SymbolPin& pin) noexcept
+{
+    Q_ASSERT(mPinGraphicsItems.contains(pin.getUuid()));
+    mPinGraphicsItems.remove(pin.getUuid()); // this deletes the graphics item
+}
+
 void SymbolGraphicsItem::setSelectionRect(const QRectF rect) noexcept
 {
-    /*foreach (const QSharedPointer<SymbolPinGraphicsItem>& item, mPinGraphicsItems) {
-        QPolygonF mappedRect = mapToItem(item.data(), rect);
-        item->setSelected(item->shape().intersects(mappedRect));
-    }*/
+    QPainterPath path;
+    path.addRect(rect);
+    foreach (const QSharedPointer<SymbolPinGraphicsItem>& item, mPinGraphicsItems) {
+        QPainterPath mappedPath = mapToItem(item.data(), path);
+        item->setSelected(item->shape().intersects(mappedPath));
+    }
 }
 
 /*****************************************************************************************

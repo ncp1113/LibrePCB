@@ -51,7 +51,10 @@ HEADERS += \
     cmp/cmpsigpindisplaytypecombobox.h \
     sym/symbolpingraphicsitem.h \
     sym/symbolgraphicsitem.h \
-    sym/symbolpolygongraphicsitem.h
+    sym/symbolpolygongraphicsitem.h \
+    sym/cmd/cmdsymbolpinedit.h \
+    sym/cmd/cmdsymbolpinremove.h \
+    sym/cmd/cmdsymbolpinadd.h
 
 SOURCES += \
     cat/componentcategory.cpp \
@@ -83,5 +86,8 @@ SOURCES += \
     cmp/cmpsigpindisplaytypecombobox.cpp \
     sym/symbolpingraphicsitem.cpp \
     sym/symbolgraphicsitem.cpp \
-    sym/symbolpolygongraphicsitem.cpp
+    sym/symbolpolygongraphicsitem.cpp \
+    sym/cmd/cmdsymbolpinedit.cpp \
+    sym/cmd/cmdsymbolpinremove.cpp \
+    sym/cmd/cmdsymbolpinadd.cpp
 

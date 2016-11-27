@@ -69,6 +69,13 @@
     </property>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
+    <addaction name="separator"/>
+    <addaction name="actionRotateCcw"/>
+    <addaction name="actionRotateCw"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionPaste"/>
+    <addaction name="actionRemove"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -82,6 +89,7 @@
      <string>Tools</string>
     </property>
     <addaction name="actionToolSelect"/>
+    <addaction name="actionAddSymbolPin"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -98,9 +106,9 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QToolBar" name="toolBar">
+  <widget class="QToolBar" name="fileToolbar">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string>File</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -114,33 +122,29 @@
    <addaction name="actionUndo"/>
    <addaction name="actionRedo"/>
   </widget>
-  <widget class="QToolBar" name="toolBar_2">
+  <widget class="QToolBar" name="editToolbar">
    <property name="windowTitle">
-    <string>toolBar_2</string>
+    <string>Edit</string>
    </property>
-   <attribute name="toolBarArea">
-    <enum>LeftToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
+   <property name="floatable">
     <bool>false</bool>
-   </attribute>
-   <addaction name="actionToolSelect"/>
-  </widget>
-  <widget class="QToolBar" name="toolBar_3">
-   <property name="windowTitle">
-    <string>toolBar_3</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
-   <addaction name="actionAbortCommand"/>
+   <addaction name="actionRotateCcw"/>
+   <addaction name="actionRotateCw"/>
+   <addaction name="actionCut"/>
+   <addaction name="actionCopy"/>
+   <addaction name="actionPaste"/>
+   <addaction name="actionRemove"/>
   </widget>
-  <widget class="QToolBar" name="toolBar_4">
+  <widget class="QToolBar" name="viewToolbar">
    <property name="windowTitle">
-    <string>toolBar_4</string>
+    <string>View</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -151,6 +155,31 @@
    <addaction name="actionZoomIn"/>
    <addaction name="actionZoomOut"/>
    <addaction name="actionZoomAll"/>
+  </widget>
+  <widget class="QToolBar" name="commandToolbar">
+   <property name="windowTitle">
+    <string>Command</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
+   </attribute>
+   <addaction name="actionAbortCommand"/>
+  </widget>
+  <widget class="QToolBar" name="toolsToolbar">
+   <property name="windowTitle">
+    <string>Tools</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionToolSelect"/>
+   <addaction name="actionAddSymbolPin"/>
   </widget>
   <action name="actionAbout">
    <property name="icon">
@@ -247,6 +276,78 @@
     <string>Zoom All</string>
    </property>
   </action>
+  <action name="actionRotateCcw">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/rotate_left.png</normaloff>:/img/actions/rotate_left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate Counterclockwise</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
+   </property>
+  </action>
+  <action name="actionRotateCw">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/rotate_right.png</normaloff>:/img/actions/rotate_right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate Clockwise</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+R</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/copy.png</normaloff>:/img/actions/copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/cut.png</normaloff>:/img/actions/cut.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
+   </property>
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionRemove">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/delete.png</normaloff>:/img/actions/delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+  </action>
   <action name="actionToolSelect">
    <property name="icon">
     <iconset resource="../../../img/images.qrc">
@@ -254,6 +355,15 @@
    </property>
    <property name="text">
     <string>Select</string>
+   </property>
+  </action>
+  <action name="actionAddSymbolPin">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/add_symbol_pin.png</normaloff>:/img/actions/add_symbol_pin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Symbol Pin</string>
    </property>
   </action>
  </widget>

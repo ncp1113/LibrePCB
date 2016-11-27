@@ -21,33 +21,61 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "symboleditorstate.h"
+#include "cmdsymbolpinadd.h"
+#include "../symbol.h"
+#include "../symbolpin.h"
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
 namespace library {
-namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-SymbolEditorState::SymbolEditorState(const Context& context) noexcept :
-    QObject(nullptr), mContext(context)
+CmdSymbolPinAdd::CmdSymbolPinAdd(Symbol& symbol) noexcept :
+    UndoCommand(tr("Add pin")), mSymbol(symbol),
+    mPin(new SymbolPin(Uuid::createRandom(), "Pin", Point(0, 0), Length(2540000), Angle::deg0()))
 {
 }
 
-SymbolEditorState::~SymbolEditorState() noexcept
+CmdSymbolPinAdd::CmdSymbolPinAdd(Symbol& symbol, SymbolPin& pin) noexcept :
+    UndoCommand(tr("Add pin")), mSymbol(symbol), mPin(&pin)
 {
+}
+
+CmdSymbolPinAdd::~CmdSymbolPinAdd() noexcept
+{
+    if (!isCurrentlyExecuted()) {
+        delete mPin;
+    }
+}
+
+/*****************************************************************************************
+ *  Inherited from UndoCommand
+ ****************************************************************************************/
+
+bool CmdSymbolPinAdd::performExecute() throw (Exception)
+{
+    performRedo(); // can throw
+    return true;
+}
+
+void CmdSymbolPinAdd::performUndo() throw (Exception)
+{
+    mSymbol.removePin(*mPin);
+}
+
+void CmdSymbolPinAdd::performRedo() throw (Exception)
+{
+    mSymbol.addPin(*mPin);
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
 } // namespace library
 } // namespace librepcb
-

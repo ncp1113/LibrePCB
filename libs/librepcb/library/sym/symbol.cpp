@@ -22,6 +22,7 @@
  ****************************************************************************************/
 #include <QtCore>
 #include "symbol.h"
+#include "symbolgraphicsitem.h"
 #include <librepcb/common/fileio/xmldomdocument.h>
 #include <librepcb/common/fileio/xmldomelement.h>
 
@@ -39,12 +40,14 @@ Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
                const QString& name_en_US, const QString& description_en_US,
                const QString& keywords_en_US) throw (Exception) :
     LibraryElement(getShortElementName(), getLongElementName(), uuid, version, author,
-                   name_en_US, description_en_US, keywords_en_US)
+                   name_en_US, description_en_US, keywords_en_US),
+    mRegisteredGraphicsItem(nullptr)
 {
 }
 
 Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) throw (Exception) :
-    LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly)
+    LibraryElement(elementDirectory, getShortElementName(), getLongElementName(), readOnly),
+    mRegisteredGraphicsItem(nullptr)
 {
     try
     {
@@ -94,6 +97,7 @@ Symbol::Symbol(const FilePath& elementDirectory, bool readOnly) throw (Exception
 
 Symbol::~Symbol() noexcept
 {
+    Q_ASSERT(mRegisteredGraphicsItem == nullptr);
     qDeleteAll(mTexts);         mTexts.clear();
     qDeleteAll(mEllipses);      mEllipses.clear();
     qDeleteAll(mPolygons);      mPolygons.clear();
@@ -104,16 +108,30 @@ Symbol::~Symbol() noexcept
  *  FootprintPad Methods
  ****************************************************************************************/
 
+/*QList<SymbolPin*> Symbol::getPinsInRect(const Point& p1, const Point& p2) noexcept
+{
+    QList<SymbolPin*> list;
+    QRectF rect(p1.toPxQPointF(), p2.toPxQPointF());
+    foreach (SymbolPin* pin, mPins) { Q_ASSERT(pin);
+        if (rect.contains(pin->getPosition().toPxQPointF())) {
+            list.append(pin);
+        }
+    }
+    return list;
+}*/
+
 void Symbol::addPin(SymbolPin& pin) noexcept
 {
     Q_ASSERT(!mPins.contains(pin.getUuid()));
     mPins.insert(pin.getUuid(), &pin);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->addPin(pin);
 }
 
 void Symbol::removePin(SymbolPin& pin) noexcept
 {
     Q_ASSERT(mPins.contains(pin.getUuid()));
     Q_ASSERT(mPins.value(pin.getUuid()) == &pin);
+    if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->removePin(pin);
     mPins.remove(pin.getUuid());
 }
 
@@ -163,6 +181,22 @@ void Symbol::removeText(Text& text) noexcept
 {
     Q_ASSERT(mTexts.contains(&text));
     mTexts.removeAll(&text);
+}
+
+/*****************************************************************************************
+ *  General Methods
+ ****************************************************************************************/
+
+void Symbol::registerGraphicsItem(SymbolGraphicsItem& item) noexcept
+{
+    Q_ASSERT(!mRegisteredGraphicsItem);
+    mRegisteredGraphicsItem = &item;
+}
+
+void Symbol::unregisterGraphicsItem(SymbolGraphicsItem& item) noexcept
+{
+    Q_ASSERT(mRegisteredGraphicsItem == &item);
+    mRegisteredGraphicsItem = nullptr;
 }
 
 /*****************************************************************************************

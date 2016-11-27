@@ -66,6 +66,7 @@ SymbolEditorWidget::SymbolEditorWidget(workspace::Workspace& ws, LibraryEditor& 
     mUi->formLayout->getWidgetPosition(mUi->lblCategories, &row, &role);
     mUi->formLayout->setWidget(row, QFormLayout::FieldRole, mCategoriesEditorWidget.data());
 
+    // load symbol
     mSymbol.reset(new Symbol(fp, false)); // can throw
     setWindowTitle(mSymbol->getName(mLocaleOrder));
     mUi->lblUuid->setText(QString("<a href=\"%1\">%2</a>").arg(
@@ -79,45 +80,14 @@ SymbolEditorWidget::SymbolEditorWidget(workspace::Workspace& ws, LibraryEditor& 
     mCategoriesEditorWidget->setUuids(mSymbol->getCategories());
     mUi->cbxDeprecated->setChecked(mSymbol->isDeprecated());
 
-    // load graphics item
+    // load graphics items recursively
     mGraphicsItem.reset(new SymbolGraphicsItem(*mSymbol, editor));
     mGraphicsScene->addItem(*mGraphicsItem);
-    /*foreach (const SymbolPin* pin, mSymbol->getPins()) {
-        mGraphicsScene->addItem(*new SymbolPinGraphicsItem(*pin, editor));
-    }*/
-
-    /*mGraphicsItem.reset(new SymbolGraphicsItem(*mSymbol, editor));
-
-    QGraphicsItemGroup* g = new QGraphicsItemGroup();
-    g->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    mGraphicsScene->addItem(*g);
-
-    EllipseGraphicsItem* e1 = new EllipseGraphicsItem(g);
-    e1->setLineLayer(mLibraryEditor.getSchematicLayer(10));
-    e1->setFillLayer(mLibraryEditor.getSchematicLayer(10));
-    e1->setRadius(Length::fromMm(2), Length::fromMm(2));
-    e1->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    //mGraphicsScene->addItem(*e1);
-    g->addToGroup(e1);
-
-    EllipseGraphicsItem* e2 = new EllipseGraphicsItem(g);
-    e2->setLineLayer(mLibraryEditor.getSchematicLayer(10));
-    e2->setFillLayer(mLibraryEditor.getSchematicLayer(10));
-    e2->setRadius(Length::fromMm(3), Length::fromMm(3));
-    e2->setPosition(Point(Length::fromMm(5), Length::fromMm(5)));
-    e2->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    //mGraphicsScene->addItem(*e2);
-    g->addToGroup(e2);
-
-    //QGraphicsItemGroup* g = mGraphicsScene->createItemGroup(mGraphicsScene->items());
-    //g->setFlag(QGraphicsItem::ItemIsSelectable, true);*/
-
-
     mUi->graphicsView->zoomAll();
 
     // load finite state machine (FSM)
     SymbolEditorState::Context fsmContext {
-        *this, *mUndoStack, *mGraphicsScene, *mSymbol, *mGraphicsItem
+        *this, *mUndoStack, *mGraphicsScene, *mGridProperties, *mSymbol, *mGraphicsItem
     };
     mFsm.reset(new SymbolEditorFsm(fsmContext));
 
@@ -158,6 +128,36 @@ bool SymbolEditorWidget::save() noexcept
         QMessageBox::critical(this, tr("Save failed"), e.getUserMsg());
         return false;
     }
+}
+
+void SymbolEditorWidget::rotateCw() noexcept
+{
+    mFsm->processRotateCw();
+}
+
+void SymbolEditorWidget::rotateCcw() noexcept
+{
+    mFsm->processRotateCcw();
+}
+
+void SymbolEditorWidget::remove() noexcept
+{
+    mFsm->processRemove();
+}
+
+void SymbolEditorWidget::abortCommand() noexcept
+{
+    mFsm->processAbortCommand();
+}
+
+void SymbolEditorWidget::startSelecting() noexcept
+{
+    mFsm->processStartSelecting();
+}
+
+void SymbolEditorWidget::startAddingSymbolPins() noexcept
+{
+    mFsm->processStartAddingSymbolPins();
 }
 
 /*****************************************************************************************

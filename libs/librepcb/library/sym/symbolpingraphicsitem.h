@@ -51,27 +51,32 @@ class SymbolPin;
  * @author ubruhin
  * @date 2016-11-05
  */
-class SymbolPinGraphicsItem final : public QGraphicsItemGroup
+class SymbolPinGraphicsItem final : public QGraphicsItem
 {
     public:
 
         // Constructors / Destructor
         SymbolPinGraphicsItem() = delete;
         SymbolPinGraphicsItem(const SymbolPinGraphicsItem& other) = delete;
-        SymbolPinGraphicsItem(const SymbolPin& pin,
+        SymbolPinGraphicsItem(SymbolPin& pin,
                               const IF_SchematicLayerProvider& layerProvider,
                               QGraphicsItem* parent = nullptr) noexcept;
         ~SymbolPinGraphicsItem() noexcept;
+
+        // Getters
+        SymbolPin& getPin() noexcept {return mPin;}
 
         // Setters
         void setPosition(const Point& pos) noexcept;
         void setRotation(const Angle& rot) noexcept;
         void setLength(const Length& length) noexcept;
         void setName(const QString& name) noexcept;
+        void setSelected(bool selected) noexcept;
 
         // Inherited from QGraphicsItem
-        QVariant itemChange(GraphicsItemChange change, const QVariant &value) noexcept override;
+        QRectF boundingRect() const noexcept override {return QRectF();}
         QPainterPath shape() const noexcept override;
+        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) noexcept override;
 
         // Operator Overloadings
         SymbolPinGraphicsItem& operator=(const SymbolPinGraphicsItem& rhs) = delete;
@@ -82,7 +87,7 @@ class SymbolPinGraphicsItem final : public QGraphicsItemGroup
 
 
     private: // Data
-        const SymbolPin& mPin;
+        SymbolPin& mPin;
         QScopedPointer<EllipseGraphicsItem> mCircleGraphicsItem;
         QScopedPointer<LineGraphicsItem> mLineGraphicsItem;
         QScopedPointer<TextGraphicsItem> mTextGraphicsItem;

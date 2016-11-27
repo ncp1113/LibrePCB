@@ -21,54 +21,67 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdmoveselectedsymbolitems.h"
-#include <librepcb/common/gridproperties.h>
-#include <librepcb/library/sym/symbolgraphicsitem.h>
-#include <librepcb/library/sym/symbolpingraphicsitem.h>
-#include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
+#include "cmdsymbolpinedit.h"
+#include "../symbolpin.h"
 
 /*****************************************************************************************
  *  Namespace
  ****************************************************************************************/
 namespace librepcb {
 namespace library {
-namespace editor {
 
 /*****************************************************************************************
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdMoveSelectedSymbolItems::CmdMoveSelectedSymbolItems(const SymbolEditorState::Context& context,
-                                                       const Point& startPos) noexcept :
-    UndoCommandGroup(tr("Move Symbol Elements")),
-    mContext(context), mStartPos(startPos), mDeltaPos(0, 0)
+CmdSymbolPinEdit::CmdSymbolPinEdit(SymbolPin& pin) noexcept :
+    UndoCommand(tr("Edit pin")), mPin(pin),
+    mOldPos(pin.getPosition()), mNewPos(mOldPos),
+    mOldRotation(pin.getRotation()), mNewRotation(mOldRotation)
 {
-    QList<QSharedPointer<SymbolPinGraphicsItem>> pins = context.symbolGraphicsItem.getSelectedPins();
-    foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin, pins) {Q_ASSERT(pin);
-        mPinEditCmds.append(new CmdSymbolPinEdit(pin->getPin()));
+}
+
+CmdSymbolPinEdit::~CmdSymbolPinEdit() noexcept
+{
+    if (!wasEverExecuted()) {
+        mPin.setPosition(mOldPos);
+        mPin.setRotation(mOldRotation);
     }
 }
 
-CmdMoveSelectedSymbolItems::~CmdMoveSelectedSymbolItems() noexcept
-{
-    deleteAllCommands();
-}
-
 /*****************************************************************************************
- *  General Methods
+ *  Setters
  ****************************************************************************************/
 
-void CmdMoveSelectedSymbolItems::setCurrentPosition(const Point& pos) noexcept
+void CmdSymbolPinEdit::setPosition(const Point& pos, bool immediate) noexcept
 {
-    Point delta = pos - mStartPos;
-    delta.mapToGrid(mContext.gridProperties.getInterval());
+    Q_ASSERT(!wasEverExecuted());
+    mNewPos = pos;
+    if (immediate) mPin.setPosition(mNewPos);
+}
 
-    if (delta != mDeltaPos) {
-        // move selected elements
-        foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) {
-            cmd->setDeltaToStartPos(delta, true);
-        }
-        mDeltaPos = delta;
+void CmdSymbolPinEdit::setDeltaToStartPos(const Point& deltaPos, bool immediate) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mNewPos = mOldPos + deltaPos;
+    if (immediate) mPin.setPosition(mNewPos);
+}
+
+void CmdSymbolPinEdit::setRotation(const Angle& angle, bool immediate) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mNewRotation = angle;
+    if (immediate) mPin.setRotation(mNewRotation);
+}
+
+void CmdSymbolPinEdit::rotate(const Angle& angle, const Point& center, bool immediate) noexcept
+{
+    Q_ASSERT(!wasEverExecuted());
+    mNewPos.rotate(angle, center);
+    mNewRotation += angle;
+    if (immediate) {
+        mPin.setPosition(mNewPos);
+        mPin.setRotation(mNewRotation);
     }
 }
 
@@ -76,36 +89,28 @@ void CmdMoveSelectedSymbolItems::setCurrentPosition(const Point& pos) noexcept
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdMoveSelectedSymbolItems::performExecute() throw (Exception)
+bool CmdSymbolPinEdit::performExecute() throw (Exception)
 {
-    if (mDeltaPos.isOrigin()) {
-        // no movement required --> discard all move commands
-        deleteAllCommands();
-        return false;
-    }
+    performRedo(); // can throw
 
-    // move all child commands to parent class
-    while (mPinEditCmds.count() > 0) {
-        appendChild(mPinEditCmds.takeLast());
-    }
-
-    // execute all child commands
-    return UndoCommandGroup::performExecute(); // can throw
+    return true; // TODO: determine if the pin was really modified
 }
 
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-void CmdMoveSelectedSymbolItems::deleteAllCommands() noexcept
+void CmdSymbolPinEdit::performUndo() throw (Exception)
 {
-    qDeleteAll(mPinEditCmds);           mPinEditCmds.clear();
+    mPin.setPosition(mOldPos);
+    mPin.setRotation(mOldRotation);
+}
+
+void CmdSymbolPinEdit::performRedo() throw (Exception)
+{
+    mPin.setPosition(mNewPos);
+    mPin.setRotation(mNewRotation);
 }
 
 /*****************************************************************************************
  *  End of File
  ****************************************************************************************/
 
-} // namespace editor
 } // namespace library
 } // namespace librepcb

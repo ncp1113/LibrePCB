@@ -21,8 +21,9 @@
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "cmdmoveselectedsymbolitems.h"
+#include "cmdrotateselectedsymbolitems.h"
 #include <librepcb/common/gridproperties.h>
+#include <librepcb/library/sym/symbolpin.h>
 #include <librepcb/library/sym/symbolgraphicsitem.h>
 #include <librepcb/library/sym/symbolpingraphicsitem.h>
 #include <librepcb/library/sym/cmd/cmdsymbolpinedit.h>
@@ -38,68 +39,47 @@ namespace editor {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdMoveSelectedSymbolItems::CmdMoveSelectedSymbolItems(const SymbolEditorState::Context& context,
-                                                       const Point& startPos) noexcept :
-    UndoCommandGroup(tr("Move Symbol Elements")),
-    mContext(context), mStartPos(startPos), mDeltaPos(0, 0)
+CmdRotateSelectedSymbolItems::CmdRotateSelectedSymbolItems(const SymbolEditorState::Context& context,
+                                                       const Angle& angle) noexcept :
+    UndoCommandGroup(tr("Rotate Symbol Elements")), mContext(context), mAngle(angle)
 {
-    QList<QSharedPointer<SymbolPinGraphicsItem>> pins = context.symbolGraphicsItem.getSelectedPins();
-    foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin, pins) {Q_ASSERT(pin);
-        mPinEditCmds.append(new CmdSymbolPinEdit(pin->getPin()));
-    }
 }
 
-CmdMoveSelectedSymbolItems::~CmdMoveSelectedSymbolItems() noexcept
+CmdRotateSelectedSymbolItems::~CmdRotateSelectedSymbolItems() noexcept
 {
-    deleteAllCommands();
-}
-
-/*****************************************************************************************
- *  General Methods
- ****************************************************************************************/
-
-void CmdMoveSelectedSymbolItems::setCurrentPosition(const Point& pos) noexcept
-{
-    Point delta = pos - mStartPos;
-    delta.mapToGrid(mContext.gridProperties.getInterval());
-
-    if (delta != mDeltaPos) {
-        // move selected elements
-        foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) {
-            cmd->setDeltaToStartPos(delta, true);
-        }
-        mDeltaPos = delta;
-    }
 }
 
 /*****************************************************************************************
  *  Inherited from UndoCommand
  ****************************************************************************************/
 
-bool CmdMoveSelectedSymbolItems::performExecute() throw (Exception)
+bool CmdRotateSelectedSymbolItems::performExecute() throw (Exception)
 {
-    if (mDeltaPos.isOrigin()) {
-        // no movement required --> discard all move commands
-        deleteAllCommands();
+    // get all selected items
+    QList<QSharedPointer<SymbolPinGraphicsItem>> pins = mContext.symbolGraphicsItem.getSelectedPins();
+
+    // no items selected --> nothing to do here
+    if (pins.isEmpty()) {
         return false;
     }
 
-    // move all child commands to parent class
-    while (mPinEditCmds.count() > 0) {
-        appendChild(mPinEditCmds.takeLast());
+    // find the center of all elements
+    Point center = Point(0, 0);
+    foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin, pins) {Q_ASSERT(pin);
+        center += pin->getPin().getPosition();
+    }
+    center /= pins.count();
+    center.mapToGrid(mContext.gridProperties.getInterval());
+
+    // rotate all selected elements
+    foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin, pins) {Q_ASSERT(pin);
+        CmdSymbolPinEdit* cmd = new CmdSymbolPinEdit(pin->getPin());
+        cmd->rotate(mAngle, center, false);
+        appendChild(cmd);
     }
 
     // execute all child commands
     return UndoCommandGroup::performExecute(); // can throw
-}
-
-/*****************************************************************************************
- *  Private Methods
- ****************************************************************************************/
-
-void CmdMoveSelectedSymbolItems::deleteAllCommands() noexcept
-{
-    qDeleteAll(mPinEditCmds);           mPinEditCmds.clear();
 }
 
 /*****************************************************************************************

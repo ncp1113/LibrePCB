@@ -82,6 +82,12 @@ class SymbolEditorWidget final : public EditorWidgetBase, public IF_GraphicsView
     public slots:
 
         bool save() noexcept override;
+        void rotateCw() noexcept override;
+        void rotateCcw() noexcept override;
+        void remove() noexcept override;
+        void abortCommand() noexcept override;
+        void startSelecting() noexcept override;
+        void startAddingSymbolPins() noexcept override;
 
 
     private: // Methods

@@ -17,31 +17,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_LIBRARY_EDITOR_CMDREMOVESELECTEDSYMBOLITEMS_H
+#define LIBREPCB_LIBRARY_EDITOR_CMDREMOVESELECTEDSYMBOLITEMS_H
+
 /*****************************************************************************************
  *  Includes
  ****************************************************************************************/
 #include <QtCore>
-#include "symboleditorstate.h"
+#include <librepcb/common/undocommandgroup.h>
+#include <librepcb/common/units/angle.h>
+#include "../symboleditorstate.h"
 
 /*****************************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ****************************************************************************************/
 namespace librepcb {
 namespace library {
 namespace editor {
 
 /*****************************************************************************************
- *  Constructors / Destructor
+ *  Class CmdRemoveSelectedSymbolItems
  ****************************************************************************************/
 
-SymbolEditorState::SymbolEditorState(const Context& context) noexcept :
-    QObject(nullptr), mContext(context)
+/**
+ * @brief The CmdRemoveSelectedSymbolItems class
+ *
+ * @author  ubruhin
+ * @date    2016-11-05
+ */
+class CmdRemoveSelectedSymbolItems final : public UndoCommandGroup
 {
-}
+    public:
 
-SymbolEditorState::~SymbolEditorState() noexcept
-{
-}
+        // Constructors / Destructor
+        CmdRemoveSelectedSymbolItems() = delete;
+        CmdRemoveSelectedSymbolItems(const CmdRemoveSelectedSymbolItems& other) = delete;
+        CmdRemoveSelectedSymbolItems(const SymbolEditorState::Context& context) noexcept;
+        ~CmdRemoveSelectedSymbolItems() noexcept;
+
+        // Operator Overloadings
+        CmdRemoveSelectedSymbolItems& operator=(const CmdRemoveSelectedSymbolItems& rhs) = delete;
+
+
+    private:
+
+        // Private Methods
+
+        /// @copydoc UndoCommand::performExecute()
+        bool performExecute() throw (Exception) override;
+
+
+        // Private Member Variables
+        const SymbolEditorState::Context& mContext;
+};
 
 /*****************************************************************************************
  *  End of File
@@ -51,3 +79,5 @@ SymbolEditorState::~SymbolEditorState() noexcept
 } // namespace library
 } // namespace librepcb
 
+
+#endif // LIBREPCB_LIBRARY_EDITOR_CMDREMOVESELECTEDSYMBOLITEMS_H
