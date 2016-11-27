@@ -25,6 +25,7 @@
 #include "librarylistwidgetitem.h"
 #include "ui_librarylistwidgetitem.h"
 #include <librepcb/library/library.h>
+#include <librepcb/libraryeditor/libraryeditor.h>
 #include <librepcb/workspace/workspace.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
 
@@ -39,9 +40,9 @@ namespace manager {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-LibraryListWidgetItem::LibraryListWidgetItem(const workspace::Workspace& ws,
+LibraryListWidgetItem::LibraryListWidgetItem(workspace::Workspace& ws,
                                              QSharedPointer<Library> lib) noexcept :
-    QWidget(nullptr), mUi(new Ui::LibraryListWidgetItem), mLib(lib)
+    QWidget(nullptr), mUi(new Ui::LibraryListWidgetItem), mWorkspace(ws), mLib(lib)
 {
     mUi->setupUi(this);
 
@@ -91,6 +92,25 @@ QString LibraryListWidgetItem::getName() const noexcept
 bool LibraryListWidgetItem::isRemoteLibrary() const noexcept
 {
     return mLib ? mLib->isOpenedReadOnly() : false;
+}
+
+/*****************************************************************************************
+ *  Inherited from QWidget
+ ****************************************************************************************/
+
+void LibraryListWidgetItem::mouseDoubleClickEvent(QMouseEvent* e) noexcept
+{
+    if (mLib) {
+        try {
+            using library::editor::LibraryEditor;
+            QScopedPointer<LibraryEditor> editor(new LibraryEditor(mWorkspace, mLib));
+            editor->show();
+            editor.take(); // release ownership because the editor deletes itself after closing
+        } catch (const Exception& e) {
+            QMessageBox::critical(this, tr("Error"), e.getUserMsg());
+        }
+        e->accept();
+    }
 }
 
 /*****************************************************************************************

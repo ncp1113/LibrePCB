@@ -65,7 +65,7 @@ class LibraryListWidgetItem final : public QWidget
         // Constructors / Destructor
         LibraryListWidgetItem() noexcept;
         LibraryListWidgetItem(const LibraryListWidgetItem& other) = delete;
-        LibraryListWidgetItem(const workspace::Workspace& ws, QSharedPointer<Library> lib) noexcept;
+        LibraryListWidgetItem(workspace::Workspace& ws, QSharedPointer<Library> lib) noexcept;
         ~LibraryListWidgetItem() noexcept;
 
         // Getters
@@ -77,9 +77,14 @@ class LibraryListWidgetItem final : public QWidget
         LibraryListWidgetItem& operator=(const LibraryListWidgetItem& rhs) = delete;
 
 
+    protected: // Methods
+        void mouseDoubleClickEvent(QMouseEvent* e) noexcept override;
+
+
     private: // Data
 
         QScopedPointer<Ui::LibraryListWidgetItem> mUi;
+        workspace::Workspace& mWorkspace;
         QSharedPointer<Library> mLib;
 };
 
