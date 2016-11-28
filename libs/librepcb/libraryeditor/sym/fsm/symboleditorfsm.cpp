@@ -110,8 +110,8 @@ bool SymbolEditorFsm::processRemove() noexcept
 
 bool SymbolEditorFsm::processAbortCommand() noexcept
 {
-    if (getCurrentState()) {
-        return getCurrentState()->processAbortCommand();
+    if (getCurrentState() && (!getCurrentState()->processAbortCommand())) {
+        return setNextState(State::SELECT);
     } else {
         return false;
     }

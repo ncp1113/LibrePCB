@@ -43,7 +43,7 @@ namespace editor {
  ****************************************************************************************/
 
 SymbolEditorState_AddPins::SymbolEditorState_AddPins(const Context& context) noexcept :
-    SymbolEditorState(context), mCurrentPin(nullptr)
+    SymbolEditorState(context), mCurrentPin(nullptr), mCurrentGraphicsItem(nullptr)
 {
 }
 
@@ -51,6 +51,7 @@ SymbolEditorState_AddPins::~SymbolEditorState_AddPins() noexcept
 {
     Q_ASSERT(mEditCmd.isNull());
     Q_ASSERT(mCurrentPin == nullptr);
+    Q_ASSERT(mCurrentGraphicsItem == nullptr);
 }
 
 /*****************************************************************************************
@@ -59,31 +60,17 @@ SymbolEditorState_AddPins::~SymbolEditorState_AddPins() noexcept
 
 bool SymbolEditorState_AddPins::entry() noexcept
 {
-    try {
-        // TODO: clear selection
-        mContext.undoStack.beginCmdGroup(tr("Add symbol pin"));
-        QScopedPointer<CmdSymbolPinAdd> cmdAdd(new CmdSymbolPinAdd(mContext.symbol));
-        mCurrentPin = &cmdAdd->getPin();
-        mContext.undoStack.appendToCmdGroup(cmdAdd.take());
-        mEditCmd.reset(new CmdSymbolPinEdit(*mCurrentPin));
-        SymbolPinGraphicsItem* item = mContext.symbolGraphicsItem.getPinGraphicsItem(mCurrentPin->getUuid());
-        Q_ASSERT(item);
-        item->setSelected(true);
-        return true;
-    } catch (const Exception& e) {
-        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getUserMsg());
-        mCurrentPin = nullptr;
-        mEditCmd.reset();
-        return false;
-    }
+    // TODO: clear selection
+    return addNextPin(Point(0, 0), Angle::deg0());
 }
 
 bool SymbolEditorState_AddPins::exit() noexcept
 {
     try {
-        mContext.undoStack.abortCmdGroup();
+        mCurrentGraphicsItem = nullptr;
         mCurrentPin = nullptr;
         mEditCmd.reset();
+        mContext.undoStack.abortCmdGroup();
         return true;
     } catch (const Exception& e) {
         QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getUserMsg());
@@ -104,7 +91,20 @@ bool SymbolEditorState_AddPins::processGraphicsSceneMouseMoved(QGraphicsSceneMou
 
 bool SymbolEditorState_AddPins::processGraphicsSceneLeftMouseButtonPressed(QGraphicsSceneMouseEvent& e) noexcept
 {
-    return false;
+    Point currentPos = Point::fromPx(e.scenePos(), mContext.gridProperties.getInterval());
+    mEditCmd->setPosition(currentPos, true);
+    Angle currentRot = mCurrentPin->getRotation();
+    try {
+        mCurrentGraphicsItem->setSelected(false);
+        mCurrentGraphicsItem = nullptr;
+        mCurrentPin = nullptr;
+        mContext.undoStack.appendToCmdGroup(mEditCmd.take());
+        mContext.undoStack.commitCmdGroup();
+        return addNextPin(currentPos, currentRot);
+    } catch (const Exception& e) {
+        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getUserMsg());
+        return false;
+    }
 }
 
 bool SymbolEditorState_AddPins::processGraphicsSceneLeftMouseButtonReleased(QGraphicsSceneMouseEvent& e) noexcept
@@ -148,7 +148,27 @@ bool SymbolEditorState_AddPins::processStartAddingSymbolPins() noexcept
  *  Private Methods
  ****************************************************************************************/
 
-
+bool SymbolEditorState_AddPins::addNextPin(const Point& pos, const Angle& rot) noexcept
+{
+    try {
+        mContext.undoStack.beginCmdGroup(tr("Add symbol pin"));
+        QScopedPointer<CmdSymbolPinAdd> cmdAdd(
+                    new CmdSymbolPinAdd(mContext.symbol, pos, rot));
+        mCurrentPin = &cmdAdd->getPin();
+        mContext.undoStack.appendToCmdGroup(cmdAdd.take());
+        mEditCmd.reset(new CmdSymbolPinEdit(*mCurrentPin));
+        mCurrentGraphicsItem = mContext.symbolGraphicsItem.getPinGraphicsItem(mCurrentPin->getUuid());
+        Q_ASSERT(mCurrentGraphicsItem);
+        mCurrentGraphicsItem->setSelected(true);
+        return true;
+    } catch (const Exception& e) {
+        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getUserMsg());
+        mCurrentGraphicsItem = nullptr;
+        mCurrentPin = nullptr;
+        mEditCmd.reset();
+        return false;
+    }
+}
 
 /*****************************************************************************************
  *  End of File

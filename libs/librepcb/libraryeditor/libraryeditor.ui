@@ -51,7 +51,7 @@
      <x>0</x>
      <y>0</y>
      <width>596</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -167,6 +167,7 @@
     <bool>true</bool>
    </attribute>
    <addaction name="actionAbortCommand"/>
+   <addaction name="separator"/>
   </widget>
   <widget class="QToolBar" name="toolsToolbar">
    <property name="windowTitle">
@@ -212,6 +213,9 @@
    <property name="text">
     <string>New</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionSave">
    <property name="icon">
@@ -220,6 +224,9 @@
    </property>
    <property name="text">
     <string>Save Library</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionUndo">
@@ -230,6 +237,9 @@
    <property name="text">
     <string>Undo</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
   </action>
   <action name="actionRedo">
    <property name="icon">
@@ -239,6 +249,9 @@
    <property name="text">
     <string>Redo</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
+   </property>
   </action>
   <action name="actionAbortCommand">
    <property name="icon">
@@ -247,6 +260,9 @@
    </property>
    <property name="text">
     <string>Abort Command</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
    </property>
   </action>
   <action name="actionZoomIn">

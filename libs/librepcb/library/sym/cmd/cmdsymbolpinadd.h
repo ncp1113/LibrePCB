@@ -50,7 +50,8 @@ class CmdSymbolPinAdd final : public UndoCommand
         // Constructors / Destructor
         CmdSymbolPinAdd() = delete;
         CmdSymbolPinAdd(const CmdSymbolPinAdd& other) = delete;
-        CmdSymbolPinAdd(Symbol& symbol) noexcept;
+        CmdSymbolPinAdd(Symbol& symbol, const Point& pos = Point(0, 0),
+                        const Angle& rot = Angle::deg0()) noexcept;
         CmdSymbolPinAdd(Symbol& symbol, SymbolPin& pin) noexcept;
         ~CmdSymbolPinAdd() noexcept;
 

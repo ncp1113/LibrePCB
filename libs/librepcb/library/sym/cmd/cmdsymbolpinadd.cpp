@@ -35,9 +35,9 @@ namespace library {
  *  Constructors / Destructor
  ****************************************************************************************/
 
-CmdSymbolPinAdd::CmdSymbolPinAdd(Symbol& symbol) noexcept :
+CmdSymbolPinAdd::CmdSymbolPinAdd(Symbol& symbol, const Point& pos, const Angle& rot) noexcept :
     UndoCommand(tr("Add pin")), mSymbol(symbol),
-    mPin(new SymbolPin(Uuid::createRandom(), "Pin", Point(0, 0), Length(2540000), Angle::deg0()))
+    mPin(new SymbolPin(Uuid::createRandom(), "Pin", pos, Length(2540000), rot))
 {
 }
 

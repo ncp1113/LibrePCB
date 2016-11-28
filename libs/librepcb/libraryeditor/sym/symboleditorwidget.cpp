@@ -130,34 +130,34 @@ bool SymbolEditorWidget::save() noexcept
     }
 }
 
-void SymbolEditorWidget::rotateCw() noexcept
+bool SymbolEditorWidget::rotateCw() noexcept
 {
-    mFsm->processRotateCw();
+    return mFsm->processRotateCw();
 }
 
-void SymbolEditorWidget::rotateCcw() noexcept
+bool SymbolEditorWidget::rotateCcw() noexcept
 {
-    mFsm->processRotateCcw();
+    return mFsm->processRotateCcw();
 }
 
-void SymbolEditorWidget::remove() noexcept
+bool SymbolEditorWidget::remove() noexcept
 {
-    mFsm->processRemove();
+    return mFsm->processRemove();
 }
 
-void SymbolEditorWidget::abortCommand() noexcept
+bool SymbolEditorWidget::abortCommand() noexcept
 {
-    mFsm->processAbortCommand();
+    return mFsm->processAbortCommand();
 }
 
-void SymbolEditorWidget::startSelecting() noexcept
+bool SymbolEditorWidget::startSelecting() noexcept
 {
-    mFsm->processStartSelecting();
+    return mFsm->processStartSelecting();
 }
 
-void SymbolEditorWidget::startAddingSymbolPins() noexcept
+bool SymbolEditorWidget::startAddingSymbolPins() noexcept
 {
-    mFsm->processStartAddingSymbolPins();
+    return mFsm->processStartAddingSymbolPins();
 }
 
 /*****************************************************************************************

@@ -34,6 +34,7 @@ namespace librepcb {
 namespace library {
 
 class SymbolPin;
+class SymbolPinGraphicsItem;
 class CmdSymbolPinEdit;
 
 namespace editor {
@@ -80,12 +81,13 @@ class SymbolEditorState_AddPins final : public SymbolEditorState
 
 
     private: // Methods
-
+        bool addNextPin(const Point& pos, const Angle& rot) noexcept;
 
 
     private: // Types / Data
         QScopedPointer<CmdSymbolPinEdit> mEditCmd;
         SymbolPin* mCurrentPin;
+        SymbolPinGraphicsItem* mCurrentGraphicsItem;
 };
 
 /*****************************************************************************************

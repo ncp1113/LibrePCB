@@ -100,6 +100,12 @@ class EditorWidgetBase : public QWidget
         virtual bool save() noexcept;
         virtual void undo() noexcept;
         virtual void redo() noexcept;
+        virtual bool rotateCw() noexcept {return false;}
+        virtual bool rotateCcw() noexcept {return false;}
+        virtual bool remove() noexcept {return false;}
+        virtual bool abortCommand() noexcept {return false;}
+        virtual bool startSelecting() noexcept {return false;}
+        virtual bool startAddingSymbolPins() noexcept {return false;}
 
 
     signals:
