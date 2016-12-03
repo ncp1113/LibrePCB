@@ -33,6 +33,8 @@
  ****************************************************************************************/
 namespace librepcb {
 
+class ExclusiveActionGroup;
+
 namespace workspace {
 class Workspace;
 }
@@ -123,6 +125,7 @@ class LibraryEditor final : public QMainWindow, public IF_SchematicLayerProvider
         workspace::Workspace& mWorkspace;
         QSharedPointer<Library> mLibrary;
         QScopedPointer<Ui::LibraryEditor> mUi;
+        QScopedPointer<ExclusiveActionGroup> mToolsToolbarProxy;
         QMap<int, SchematicLayer*> mSchematicLayers;
         QList<QMetaObject::Connection> mCurrentTabActionConnections;
 };

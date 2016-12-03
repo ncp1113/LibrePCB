@@ -26,6 +26,7 @@
 #include "libraryeditor.h"
 #include "ui_libraryeditor.h"
 #include <librepcb/common/schematiclayer.h>
+#include <librepcb/common/utils/exclusiveactiongroup.h>
 #include <librepcb/library/library.h>
 #include <librepcb/workspace/workspace.h>
 #include <librepcb/workspace/settings/workspacesettings.h>
@@ -63,6 +64,16 @@ LibraryEditor::LibraryEditor(workspace::Workspace& ws, QSharedPointer<Library> l
     QString libName = mLibrary->getName(localeOrder);
     if (mLibrary->isOpenedReadOnly()) libName.append(tr(" [Read-Only]"));
     setWindowTitle(QString(tr("%1 - LibrePCB Library Editor")).arg(libName));
+
+    // create tools toolbar proxy
+    mToolsToolbarProxy.reset(new ExclusiveActionGroup());
+    for (int i = 0; i < mUi->toolsToolbar->actions().count(); i++) {
+        QAction* action = mUi->toolsToolbar->actions().value(i);
+        mToolsToolbarProxy->addAction(QVariant(i), action);
+        mToolsToolbarProxy->setActionEnabled(QVariant(i), i % 3);
+    }
+    connect(mToolsToolbarProxy.data(), &ExclusiveActionGroup::changeRequestTriggered,
+            mToolsToolbarProxy.data(), &ExclusiveActionGroup::setCurrentAction);
 
     // add all required layers
     addSchematicLayer(SchematicLayer::LayerID::Grid);
@@ -272,12 +283,12 @@ void LibraryEditor::currentTabChanged(int index) noexcept
                     connect(mUi->actionAbortCommand, &QAction::triggered,
                             widget, &EditorWidgetBase::abortCommand));
         // connect tools actions
-        mCurrentTabActionConnections.append(
+        /*mCurrentTabActionConnections.append(
                     connect(mUi->actionToolSelect, &QAction::triggered,
                             widget, &EditorWidgetBase::startSelecting));
         mCurrentTabActionConnections.append(
                     connect(mUi->actionAddSymbolPin, &QAction::triggered,
-                            widget, &EditorWidgetBase::startAddingSymbolPins));
+                            widget, &EditorWidgetBase::startAddingSymbolPins));*/
     }
 }
 

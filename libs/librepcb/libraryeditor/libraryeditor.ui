@@ -51,7 +51,7 @@
      <x>0</x>
      <y>0</y>
      <width>596</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -89,7 +89,16 @@
      <string>Tools</string>
     </property>
     <addaction name="actionToolSelect"/>
+    <addaction name="actionDrawLine"/>
+    <addaction name="actionDrawPolygon"/>
+    <addaction name="actionDrawEllipse"/>
+    <addaction name="actionAddText"/>
+    <addaction name="separator"/>
     <addaction name="actionAddSymbolPin"/>
+    <addaction name="separator"/>
+    <addaction name="actionAddThtPad"/>
+    <addaction name="actionAddSmtPad"/>
+    <addaction name="actionAddHole"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -180,7 +189,16 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionToolSelect"/>
+   <addaction name="actionDrawLine"/>
+   <addaction name="actionDrawPolygon"/>
+   <addaction name="actionDrawEllipse"/>
+   <addaction name="actionAddText"/>
+   <addaction name="separator"/>
    <addaction name="actionAddSymbolPin"/>
+   <addaction name="separator"/>
+   <addaction name="actionAddThtPad"/>
+   <addaction name="actionAddSmtPad"/>
+   <addaction name="actionAddHole"/>
   </widget>
   <action name="actionAbout">
    <property name="icon">
@@ -380,6 +398,69 @@
    </property>
    <property name="text">
     <string>Add Symbol Pin</string>
+   </property>
+  </action>
+  <action name="actionAddThtPad">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/add_tht_pad.png</normaloff>:/img/actions/add_tht_pad.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add THT Pad</string>
+   </property>
+  </action>
+  <action name="actionAddSmtPad">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/add_smt_pad.png</normaloff>:/img/actions/add_smt_pad.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add SMT Pad</string>
+   </property>
+  </action>
+  <action name="actionDrawLine">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_line.png</normaloff>:/img/actions/draw_line.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Line</string>
+   </property>
+  </action>
+  <action name="actionAddText">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_text.png</normaloff>:/img/actions/draw_text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Text</string>
+   </property>
+  </action>
+  <action name="actionDrawPolygon">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_polygon.png</normaloff>:/img/actions/draw_polygon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Polygon</string>
+   </property>
+  </action>
+  <action name="actionDrawEllipse">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/draw_ellipse.png</normaloff>:/img/actions/draw_ellipse.png</iconset>
+   </property>
+   <property name="text">
+    <string>Draw Circle/Ellipse</string>
+   </property>
+  </action>
+  <action name="actionAddHole">
+   <property name="icon">
+    <iconset resource="../../../img/images.qrc">
+     <normaloff>:/img/actions/add_hole.png</normaloff>:/img/actions/add_hole.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Hole (NPTH)</string>
    </property>
   </action>
  </widget>

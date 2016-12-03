@@ -99,7 +99,8 @@ HEADERS += \
     graphics/linegraphicsitem.h \
     graphics/pathgraphicsitem.h \
     graphics/textgraphicsitem.h \
-    graphics/origincrossgraphicsitem.h
+    graphics/origincrossgraphicsitem.h \
+    utils/exclusiveactiongroup.h
 
 SOURCES += \
     attributes/attributetype.cpp \
@@ -163,7 +164,8 @@ SOURCES += \
     graphics/linegraphicsitem.cpp \
     graphics/pathgraphicsitem.cpp \
     graphics/textgraphicsitem.cpp \
-    graphics/origincrossgraphicsitem.cpp
+    graphics/origincrossgraphicsitem.cpp \
+    utils/exclusiveactiongroup.cpp
 
 FORMS += \
     dialogs/gridsettingsdialog.ui \
